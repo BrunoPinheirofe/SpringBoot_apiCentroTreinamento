@@ -1,21 +1,18 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
+
 import java.time.LocalDate;
+import java.util.Random;
 
 @Data
 @Entity
 @Table(name = "administradores")
 public class Administrador {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(unique = true, nullable = false)
+    private String matricula;
 
     @Column(nullable = false)
     private String nome;
@@ -38,4 +35,18 @@ public class Administrador {
     @Column(nullable = false)
     private int idade;
 
+    @OneToOne
+    @Column(nullable = true)
+    private User user;
+
+    @PrePersist
+    protected void onCreate() {
+        this.matricula = generateMatricula();
+    }
+
+    private String generateMatricula() {
+        LocalDate date = LocalDate.now();
+        int randomDigits = new Random().nextInt(9000) + 1000; // generates a 4-digit number
+        return date.toString().replace("-", "") + randomDigits;
+    }
 }

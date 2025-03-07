@@ -32,4 +32,5 @@ public class Treino {
     @NotEmpty(message = "Treino deve ter pelo menos um exercício")
     @OneToMany(mappedBy = "treino", cascade = CascadeType.ALL)
     private List<Exercicio> exercicios;
+
 } 

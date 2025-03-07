@@ -38,11 +38,11 @@ public class AnamneseController {
     // Cria nova anamnese
     @PostMapping("/alunos/{alunoId}")
     public ResponseEntity<?> criarAnamnese(
-            @PathVariable Long alunoId,
+            @PathVariable String alunoMatricula,
             @RequestBody Anamnese anamnese) {
         
         // Verifica se o aluno existe
-        Aluno aluno = alunoRepository.findById(alunoId).orElse(null);
+        Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();
         }
@@ -73,9 +73,9 @@ public class AnamneseController {
     }
 
     // Busca anamnese por aluno
-    @GetMapping("/alunos/{alunoId}")
-    public ResponseEntity<Anamnese> buscarAnamnesePorAluno(@PathVariable Long alunoId) {
-        Aluno aluno = alunoRepository.findById(alunoId).orElse(null);
+    @GetMapping("/alunos/{alunoMatricula}")
+    public ResponseEntity<Anamnese> buscarAnamnesePorAluno(@PathVariable String alunoMatricula) {
+        Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();
         }

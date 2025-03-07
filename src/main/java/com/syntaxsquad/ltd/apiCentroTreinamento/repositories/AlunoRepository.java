@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AlunoRepository extends JpaRepository<Aluno, Long> {
+public interface AlunoRepository extends JpaRepository<Aluno, String> {
     
     // Busca por email
     Optional<Aluno> findByEmail(String email);
@@ -29,4 +29,6 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     
     // Verifica se existe aluno com este email
     boolean existsByEmail(String email);
+
+    Optional<Aluno> findByMatricula(String matricula);
 } 

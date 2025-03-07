@@ -17,7 +17,7 @@ public class Anamnese {
 
     @NotNull(message = "Data de cadastro é obrigatória")
     @Column(nullable = false)
-    private LocalDate dataCadastro;
+    private LocalDate dataCadastro = LocalDate.now();
 
     // Histórico de Saúde
     @Size(max = 1000, message = "Histórico de saúde não pode ter mais que 1000 caracteres")

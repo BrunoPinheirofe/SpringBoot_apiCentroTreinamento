@@ -33,14 +33,14 @@ public class PresencaController {
     }
 
     // Registra presença
-    @PostMapping("/turmas/{turmaId}/alunos/{alunoId}")
+    @PostMapping("/turmas/{turmaId}/alunos/{alunoMatricula}")
     public ResponseEntity<?> registrarPresenca(
             @PathVariable Long turmaId,
-            @PathVariable Long alunoId,
+            @PathVariable String alunoMatricula,
             @RequestBody Presenca presenca) {
 
         Turma turma = turmaRepository.findById(turmaId).orElse(null);
-        Aluno aluno = alunoRepository.findById(alunoId).orElse(null);
+        Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
 
         if (turma == null || aluno == null) {
             return ResponseEntity.notFound().build();
@@ -60,9 +60,9 @@ public class PresencaController {
     }
 
     // Busca presenças por aluno
-    @GetMapping("/alunos/{alunoId}")
-    public ResponseEntity<List<Presenca>> buscarPresencasPorAluno(@PathVariable Long alunoId) {
-        Aluno aluno = alunoRepository.findById(alunoId).orElse(null);
+    @GetMapping("/alunos/{alunoMatricula}")
+    public ResponseEntity<List<Presenca>> buscarPresencasPorAluno(@PathVariable String alunoMatricula) {
+        Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();
         }
@@ -90,9 +90,9 @@ public class PresencaController {
     }
 
     // Conta presenças de um aluno
-    @GetMapping("/alunos/{alunoId}/contagem")
-    public ResponseEntity<Long> contarPresencasAluno(@PathVariable Long alunoId) {
-        Aluno aluno = alunoRepository.findById(alunoId).orElse(null);
+    @GetMapping("/alunos/{alunoMatricula}/contagem")
+    public ResponseEntity<Long> contarPresencasAluno(@PathVariable String alunoMatricula) {
+        Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();
         }
@@ -101,9 +101,9 @@ public class PresencaController {
     }
 
     // Lista faltas de um aluno
-    @GetMapping("/alunos/{alunoId}/faltas")
-    public ResponseEntity<List<Presenca>> listarFaltasAluno(@PathVariable Long alunoId) {
-        Aluno aluno = alunoRepository.findById(alunoId).orElse(null);
+    @GetMapping("/alunos/{alunoMatricula}/faltas")
+    public ResponseEntity<List<Presenca>> listarFaltasAluno(@PathVariable String alunoMatricula) {
+        Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();
         }

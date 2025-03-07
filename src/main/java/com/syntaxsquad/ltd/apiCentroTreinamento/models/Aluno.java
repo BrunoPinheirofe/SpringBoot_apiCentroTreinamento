@@ -1,7 +1,7 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.models;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Random;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.SexoEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,8 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
@@ -19,8 +19,7 @@ import jakarta.validation.constraints.*;
 @Table(name = "alunos")
 public class Aluno {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String matricula;
 
     @NotBlank(message = "Nome é obrigatório")
     @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
@@ -63,4 +62,19 @@ public class Aluno {
     @Size(max = 500, message = "Observação não pode ter mais que 500 caracteres")
     @Column(nullable = true)
     private String observacao;
+
+    @OneToOne
+    @Column(nullable = true)
+    private User user;
+
+    @PrePersist
+    protected void onCreate() {
+        this.matricula = generateMatricula();
+    }
+
+    private String generateMatricula() {
+        LocalDate date = LocalDate.now();
+        int randomDigits = new Random().nextInt(9000) + 1000; // generates a 4-digit number
+        return date.toString().replace("-", "") + randomDigits;
+    }
 }

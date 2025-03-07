@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AdministradorRepository extends JpaRepository<Administrador, Long> {
+public interface AdministradorRepository extends JpaRepository<Administrador, String> {
     
     // Busca por email (útil para login/verificação de duplicidade)
     Optional<Administrador> findByEmail(String email);

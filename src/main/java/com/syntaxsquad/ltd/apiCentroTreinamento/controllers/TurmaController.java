@@ -47,9 +47,9 @@ public class TurmaController {
 
     // Adiciona aluno à turma
     @PostMapping("/{turmaId}/alunos/{alunoId}")
-    public ResponseEntity<?> adicionarAluno(@PathVariable Long turmaId, @PathVariable Long alunoId) {
+    public ResponseEntity<?> adicionarAluno(@PathVariable Long turmaId, @PathVariable String alunoMatricula) {
         Turma turma = turmaRepository.findById(turmaId).orElse(null);
-        Aluno aluno = alunoRepository.findById(alunoId).orElse(null);
+        Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
 
         if (turma == null || aluno == null) {
             return ResponseEntity.notFound().build();
@@ -67,9 +67,9 @@ public class TurmaController {
 
     // Remove aluno da turma
     @DeleteMapping("/{turmaId}/alunos/{alunoId}")
-    public ResponseEntity<?> removerAluno(@PathVariable Long turmaId, @PathVariable Long alunoId) {
+    public ResponseEntity<?> removerAluno(@PathVariable Long turmaId, @PathVariable String alunoMatricula) {
         Turma turma = turmaRepository.findById(turmaId).orElse(null);
-        Aluno aluno = alunoRepository.findById(alunoId).orElse(null);
+        Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
 
         if (turma == null || aluno == null) {
             return ResponseEntity.notFound().build();
