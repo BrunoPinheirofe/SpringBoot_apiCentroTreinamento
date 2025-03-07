@@ -30,6 +30,7 @@ public class Instrutor {
     private List<Turma> turmas;
 
     @OneToOne
+    @PrimaryKeyJoinColumn
     private User user;
 
     @PrePersist

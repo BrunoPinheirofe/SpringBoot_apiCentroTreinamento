@@ -11,6 +11,7 @@ import lombok.Data;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
@@ -48,7 +49,7 @@ public class Aluno {
 
     @NotNull(message = "Data de cadastro é obrigatória")
     @Column(nullable = false)
-    private LocalDate dataCadastro;
+    private LocalDate dataCadastro = LocalDate.now();
 
     @Min(value = 0, message = "Idade não pode ser negativa")
     @Max(value = 120, message = "Idade não pode ser maior que 120")
@@ -64,7 +65,7 @@ public class Aluno {
     private String observacao;
 
     @OneToOne
-    @Column(nullable = true)
+    @PrimaryKeyJoinColumn
     private User user;
 
     @PrePersist

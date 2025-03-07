@@ -10,11 +10,10 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - ${DB_VOLUME}:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     networks:
       - ${DB_NETWORK}
 
 networks:
   centro_treinamento_network:
     driver: bridge
-

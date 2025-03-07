@@ -36,7 +36,7 @@ public class Administrador {
     private int idade;
 
     @OneToOne
-    @Column(nullable = true)
+    @PrimaryKeyJoinColumn
     private User user;
 
     @PrePersist
