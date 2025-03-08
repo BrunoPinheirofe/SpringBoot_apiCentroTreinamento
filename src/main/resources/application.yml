@@ -17,4 +17,4 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 jwt:
-  secret: 123456789
+  secret: ${SECRET_KEY}

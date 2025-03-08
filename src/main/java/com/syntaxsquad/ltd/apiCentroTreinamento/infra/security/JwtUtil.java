@@ -1,62 +1,75 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.infra.security;
 
-import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-
-import javax.crypto.SecretKey;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
-
     @Value("${jwt.secret}")
-    private String secretKey;
+    private String SECRET_KEY ;
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1 dia
 
-    private static final long EXPIRATION_TIME = 86400000; // 1 dia
-
-   public SecretKey getSigningKey() {
-        return Keys.secretKeyFor(SignatureAlgorithm.HS256);  //  256-bit key
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
-    // Gera o token JWT com o email
-    public String generateToken(String userName) {
+
+    public String generateToken(String email, List<String> roles) {
         return Jwts.builder()
-                   .setSubject(userName)
-                   .signWith(Keys.secretKeyFor(SignatureAlgorithm.HS256))  //  256-bit key
-                   .compact();
-    }
-    // Extrai o email do token JWT
-    public String getEmailFromToken(String token) {
-        try {
-            return Jwts.parser()         // Usa parserBuilder() em vez de parser()
-                    .setSigningKey(getSigningKey())  // Define a chave de assinatura
-                    .build()                        // Constrói o JwtParser
-                    .parseClaimsJws(token)          // Analisa o token JWT
-                    .getBody()
-                    .getSubject();                  // Retorna o "subject", que é o email
-        } catch (JwtException e) {
-            // Caso o token seja inválido, retorna null ou trata o erro
-            return null;
-        }
+                .setSubject(email)
+                .claim("roles", roles)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
-    // Valida o token JWT
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parser()              // Usa parserBuilder() em vez de parser()
-                    .setSigningKey(getSigningKey())  // Define a chave de assinatura
-                    .build()                        // Constrói o JwtParser
-                    .parseClaimsJws(token);         // Analisa o token JWT
-            return true;
-        } catch (JwtException e) {
-            // Caso o token seja inválido, retorna false
+            return !isTokenExpired(token);
+        } catch (Exception e) {
             return false;
         }
+    }
+
+    public String getEmailFromToken(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public List<GrantedAuthority> getRolesFromToken(String token) {
+        Claims claims = extractAllClaims(token);
+        List<String> roles = claims.get("roles", List.class);
+        return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
