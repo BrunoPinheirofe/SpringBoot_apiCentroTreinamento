@@ -42,7 +42,7 @@ public class Aluno {
 
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email deve ser válido")
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @NotBlank(message = "Telefone é obrigatório")

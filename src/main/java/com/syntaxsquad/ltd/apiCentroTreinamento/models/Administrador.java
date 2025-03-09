@@ -21,7 +21,7 @@ public class Administrador {
     private String sobrenome;
 
     @Column(nullable = false)
-    private String email;
+    private String email; 
 
     @Column(nullable = false)
     private String telefone;
@@ -30,7 +30,7 @@ public class Administrador {
     private LocalDate dataNascimento;
 
     @Column(nullable = false)
-    private LocalDate dataCadastro;
+    private LocalDate dataCadastro = LocalDate.now();
 
     @Column(nullable = false)
     private int idade;
@@ -49,4 +49,18 @@ public class Administrador {
         int randomDigits = new Random().nextInt(9000) + 1000; // generates a 4-digit number
         return date.toString().replace("-", "") + randomDigits;
     }
+
+    public Administrador(String nome, String sobrenome, String email, String telefone, LocalDate dataNascimento,
+         int idade, User user) {
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.email = email;
+        this.telefone = telefone;
+        this.dataNascimento = dataNascimento;
+        this.dataCadastro = LocalDate.now();
+        this.idade = idade;
+        this.user = user;
+    }
+
+    
 }

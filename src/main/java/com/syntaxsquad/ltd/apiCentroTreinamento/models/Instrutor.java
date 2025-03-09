@@ -25,6 +25,9 @@ public class Instrutor {
     @Column(nullable = false)
     private String especialidade;
 
+    @Column(nullable = false)
+    private String email;
+
     // Relacionamento com Turma
     @OneToMany(mappedBy = "instrutor")
     private List<Turma> turmas;
