@@ -2,12 +2,17 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.models;
 
 import java.time.LocalDate;
 import java.util.Random;
+
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.AlunoDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.SexoEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
@@ -17,6 +22,9 @@ import jakarta.validation.constraints.*;
 
 @Data
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
 @Table(name = "alunos")
 public class Aluno {
     @Id
@@ -77,5 +85,16 @@ public class Aluno {
         LocalDate date = LocalDate.now();
         int randomDigits = new Random().nextInt(9000) + 1000; // generates a 4-digit number
         return date.toString().replace("-", "") + randomDigits;
+    }
+    public Aluno(String nome, String sobrenome, String email, String telefone, LocalDate dataNascimento, int idade, SexoEnum genero, String observacao,User user) {
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.email = email;
+        this.telefone = telefone;
+        this.dataNascimento = dataNascimento;
+        this.idade = idade;
+        this.genero = genero;
+        this.observacao = observacao;
+        this.user = user;
     }
 }

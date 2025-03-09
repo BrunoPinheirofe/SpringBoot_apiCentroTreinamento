@@ -18,4 +18,6 @@ public class AlunoService {
     public Aluno findByMatricula(String matricula) {
         return alunoRepository.findById(matricula).orElse(null);
     }
+
+    
 }

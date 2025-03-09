@@ -29,7 +29,8 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
-                    .requestMatchers("/api/exercicios/**").authenticated()
+                    .requestMatchers("/api/exercicios/**").hasAuthority(UserRole.ALUNO.name())
+                    .requestMatchers("/api/alunos/**").authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
