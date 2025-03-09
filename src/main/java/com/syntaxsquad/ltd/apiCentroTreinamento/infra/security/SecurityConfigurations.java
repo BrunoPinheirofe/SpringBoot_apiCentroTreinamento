@@ -37,6 +37,7 @@ public class SecurityConfigurations {
                     .requestMatchers(HttpMethod.GET, "/api/treinos").hasAuthority(UserRole.ALUNO.name())
                     .requestMatchers(HttpMethod.GET, "/api/anamneses/**").hasAuthority(UserRole.ALUNO.name())
                     .requestMatchers(HttpMethod.GET, "/api/planos/**").hasAuthority(UserRole.ALUNO.name())
+<<<<<<< HEAD
                     // Autorização de treinador
 
                     // Autorização de admin
@@ -49,6 +50,9 @@ public class SecurityConfigurations {
                     .requestMatchers( "/api/planos/**").hasAuthority(UserRole.ADMIN.name())
                     .requestMatchers( "/api/exercicios/**").hasAuthority(UserRole.ADMIN.name())
                 
+=======
+
+>>>>>>> 9d8b04967e31f240a504a7e288009fc5279ded74
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
