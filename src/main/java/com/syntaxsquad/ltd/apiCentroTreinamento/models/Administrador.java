@@ -36,7 +36,7 @@ public class Administrador {
     private int idade;
 
     @OneToOne
-    @JoinColumn(name = "email_user", referencedColumnName = "email", unique = true)
+    @JoinColumn(name = "email_user", referencedColumnName = "email")
     private User user;
 
     @PrePersist

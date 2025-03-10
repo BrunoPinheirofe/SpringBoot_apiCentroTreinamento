@@ -33,7 +33,7 @@ public class Instrutor {
     private List<Turma> turmas;
 
     @OneToOne
-    @JoinColumn(name = "email_user", referencedColumnName = "email", unique = true)
+    @JoinColumn(name = "email_user", referencedColumnName = "email")
     private User user;
 
     @PrePersist
@@ -46,7 +46,7 @@ public class Instrutor {
         int randomDigits = new Random().nextInt(9000) + 1000; // generates a 4-digit number
         return date.toString().replace("-", "") + randomDigits;
     }
-    public void Instrutor() {
+    public Instrutor() {
     }
 
     public Instrutor(String nome, String especialidade, String email, User user) {

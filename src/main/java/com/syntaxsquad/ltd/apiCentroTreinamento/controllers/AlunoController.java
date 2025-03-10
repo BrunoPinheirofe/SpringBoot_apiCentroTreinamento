@@ -1,6 +1,8 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.controllers;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.AlunoDtoRequest;
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.AlunoDtoResponse;
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.ErrorDto;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.UserRole;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Administrador;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
@@ -53,20 +57,23 @@ public class AlunoController {
         Optional<Instrutor> existingInstrutor = instrutorRepository.findByEmail(alunoRequest.getEmail());
         Optional<Administrador> existingAdmin = adminRepository.findByEmail(alunoRequest.getEmail());
 
-        if (existingAluno.isPresent() || existingInstrutor.isPresent()
-                || existingAdmin.isPresent()) {
-            return ResponseEntity.badRequest().body("Já existe um usuário com este email.");
+        if (existingAluno.isPresent() || existingInstrutor.isPresent() || existingAdmin.isPresent()) {
+            // Erro de email já existente
+            return ResponseEntity.badRequest().body(new ErrorDto("Erro: Já existe um usuário com este email"));
         }
+
         // Verifica se o usuário com o email existe no banco de Users
         Optional<User> user = userRepository.findByEmail(alunoRequest.getEmail());
         if (!user.isPresent()) {
+            // Erro: Usuário não encontrado
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Usuário não encontrado com este email.");
+                    .body(new ErrorDto("Erro: Usuário não encontrado com este email"));
         }
 
         // Verifica se o usuário é um aluno
-        if (user.isEmpty() || user.get().getRole() != UserRole.ALUNO) {
-            return ResponseEntity.badRequest().body("Usuário não encontrado ou não tem permissão para ser aluno.");
+        if (user.get().getRole() != UserRole.ALUNO) {
+            // Erro: O usuário não tem permissão para ser aluno
+            return ResponseEntity.badRequest().body(new ErrorDto("Erro: Usuário não tem permissão para ser aluno"));
         }
 
         Aluno aluno = new Aluno(alunoRequest.getNome(), alunoRequest.getSobrenome(), alunoRequest.getEmail(),
@@ -74,7 +81,15 @@ public class AlunoController {
                 alunoRequest.getGenero(), alunoRequest.getObservacao(), user.get());
 
         Aluno alunoSalvo = alunoService.saveAluno(aluno);
-        return ResponseEntity.ok(alunoSalvo);
+
+        AlunoDtoResponse alunoDto = new AlunoDtoResponse(
+                alunoSalvo.getMatricula(), alunoSalvo.getNome(),
+                alunoSalvo.getSobrenome(), alunoSalvo.getEmail(),
+                alunoSalvo.getTelefone(), alunoSalvo.getDataNascimento(),
+                alunoSalvo.getDataCadastro(), alunoSalvo.getIdade(),
+                alunoSalvo.getGenero(), alunoSalvo.getObservacao());
+
+        return ResponseEntity.ok(alunoDto);
     }
 
     // Atualizar aluno
@@ -83,13 +98,15 @@ public class AlunoController {
         Optional<Aluno> alunoExistente = alunoRepository.findById(id);
 
         if (alunoExistente.isEmpty()) {
+            // Erro: Aluno não encontrado
             return ResponseEntity.notFound().build();
         }
 
         // Verifica se o email está sendo alterado para um email já existente
         Optional<Aluno> alunoComEmailExistente = alunoRepository.findByEmail(alunoRequest.getEmail());
         if (alunoComEmailExistente.isPresent() && !alunoComEmailExistente.get().getMatricula().equals(id)) {
-            return ResponseEntity.badRequest().body("Email já está em uso.");
+            // Erro: Email já está em uso
+            return ResponseEntity.badRequest().body(new ErrorDto("Erro: Email já está em uso"));
         }
 
         Aluno aluno = alunoExistente.get();
@@ -103,14 +120,23 @@ public class AlunoController {
         aluno.setObservacao(alunoRequest.getObservacao());
 
         Aluno alunoAtualizado = alunoService.saveAluno(aluno);
-        return ResponseEntity.ok(alunoAtualizado);
+
+        AlunoDtoResponse alunoDtoResponse = new AlunoDtoResponse(
+                alunoAtualizado.getMatricula(), alunoAtualizado.getNome(),
+                alunoAtualizado.getSobrenome(), alunoAtualizado.getEmail(),
+                alunoAtualizado.getTelefone(), alunoAtualizado.getDataNascimento(),
+                alunoAtualizado.getDataCadastro(), alunoAtualizado.getIdade(),
+                alunoAtualizado.getGenero(), alunoAtualizado.getObservacao());
+
+        return ResponseEntity.ok(alunoDtoResponse);
     }
 
     // Remover aluno
     @DeleteMapping("/{matricula}")
-    public ResponseEntity<Void> removerAluno(@PathVariable String matricula) {
+    public ResponseEntity<?> removerAluno(@PathVariable String matricula) {
         Optional<Aluno> alunoExistente = alunoRepository.findByMatricula(matricula);
         if (alunoExistente.isEmpty()) {
+            // Erro: Aluno não encontrado para remoção
             return ResponseEntity.notFound().build();
         }
         alunoRepository.deleteById(matricula);
@@ -119,24 +145,34 @@ public class AlunoController {
 
     // Buscar aluno por matricula
     @GetMapping("/{matricula}")
-    public ResponseEntity<Aluno> buscarAlunoPorMatricula(@PathVariable String matricula) {
+    public ResponseEntity<?> buscarAlunoPorMatricula(@PathVariable String matricula) {
         Aluno aluno = alunoRepository.findByMatricula(matricula).orElse(null);
         if (aluno == null) {
+            // Erro: Aluno não encontrado
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(aluno);
+        AlunoDtoResponse alunoDtoResponse = new AlunoDtoResponse(
+                aluno.getMatricula(), aluno.getNome(), aluno.getSobrenome(),
+                aluno.getEmail(), aluno.getTelefone(), aluno.getDataNascimento(),
+                aluno.getDataCadastro(), aluno.getIdade(), aluno.getGenero(), aluno.getObservacao()
+        );
+        return ResponseEntity.ok(alunoDtoResponse);
     }
 
     // Listar todos os alunos
     @GetMapping
-    public ResponseEntity<Iterable<Aluno>> listarAlunos() {
+    public ResponseEntity<Iterable<AlunoDtoResponse>> listarAlunos() {
         Iterable<Aluno> alunos = alunoRepository.findAll();
-        return ResponseEntity.ok(alunos);
-    }
+        Iterable<AlunoDtoResponse> alunosDtoResponse = StreamSupport
+                .stream(alunos.spliterator(), false)
+                .map(aluno -> new AlunoDtoResponse(
+                        aluno.getMatricula(), aluno.getNome(),
+                        aluno.getSobrenome(), aluno.getEmail(),
+                        aluno.getTelefone(), aluno.getDataNascimento(),
+                        aluno.getDataCadastro(), aluno.getIdade(),
+                        aluno.getGenero(), aluno.getObservacao()))
+                .collect(Collectors.toList());
 
-    @GetMapping("/api/alunos/test")
-    public ResponseEntity<String> testAlunosEndpoint() {
-        return ResponseEntity.ok("Aluno autenticado com sucesso!");
+        return ResponseEntity.ok(alunosDtoResponse);
     }
-
 }

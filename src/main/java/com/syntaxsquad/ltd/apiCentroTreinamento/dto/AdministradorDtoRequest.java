@@ -40,8 +40,7 @@ public class AdministradorDtoRequest {
     @Max(value = 120, message = "Idade não pode ser maior que 120")
     private int idade;
 
-    @NotNull(message = "Gênero é obrigatório de acordo com as roles (MASCULINO, FEMININO, OUTROS)")
-    private SexoEnum genero;
+   
 
 
 }

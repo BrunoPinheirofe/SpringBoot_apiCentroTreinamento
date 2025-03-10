@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.InstrutorDtoRequest;
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.InstrutorDtoResponse;
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.ErrorDto;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.UserRole;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Administrador;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
@@ -35,30 +37,36 @@ public class InstrutorController {
     @Autowired
     private AlunoRepository alunoRepository;
 
+    // Função utilitária para gerar mensagens de erro
+    private ResponseEntity<ErrorDto> gerarErro(String mensagem, HttpStatus status) {
+        ErrorDto erro = new ErrorDto(mensagem);
+        return ResponseEntity.status(status).body(erro);
+    }
+
+
+    // Função para verificar se o email já existe em outros usuários
+    private boolean emailJaCadastrado(String email) {
+        return alunoRepository.findByEmail(email).isPresent() ||
+               instrutorRepository.findByEmail(email).isPresent() ||
+               adminRepository.findByEmail(email).isPresent();
+    }
+
     // Criando Instrutor (POST)
     @PostMapping
     public ResponseEntity<?> createInstrutor(@Valid @RequestBody InstrutorDtoRequest instrutorRequest) {
-
-        // Verifica se já existe um usuário com o mesmo email nos repositórios de Aluno,
-        // Instrutor ou Administrador
-        Optional<Aluno> existingAluno = alunoRepository.findByEmail(instrutorRequest.getEmail());
-        Optional<Instrutor> existingInstrutor = instrutorRepository.findByEmail(instrutorRequest.getEmail());
-        Optional<Administrador> existingAdmin = adminRepository.findByEmail(instrutorRequest.getEmail());
-
-        if (existingAluno.isPresent() || existingInstrutor.isPresent() || existingAdmin.isPresent()) {
-            return ResponseEntity.badRequest().body("Já existe um usuário com este email.");
+        if (emailJaCadastrado(instrutorRequest.getEmail())) {
+            return gerarErro("Já existe um usuário com este email.", HttpStatus.BAD_REQUEST);
         }
 
         // Verifica se o usuário com o email existe no banco de Users
         Optional<User> user = userRepository.findByEmail(instrutorRequest.getEmail());
-        if (!user.isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário não encontrado com este email.");
+        if (user.isEmpty()) {
+            return gerarErro("Usuário não encontrado com este email.", HttpStatus.BAD_REQUEST);
         }
 
         // Verifica se o usuário tem o role de INSTRUTOR
         if (user.get().getRole() != UserRole.TREINADOR) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("O usuário não tem permissão para criar instrutores.");
+            return gerarErro("O usuário não tem permissão para criar instrutores.", HttpStatus.FORBIDDEN);
         }
 
         // Cria o objeto Instrutor
@@ -68,37 +76,54 @@ public class InstrutorController {
         // Salva o novo Instrutor no banco de dados
         instrutorRepository.save(novoInstrutor);
 
-        // Retorna o Instrutor criado como resposta
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoInstrutor);
+        // Prepara a resposta com os dados do novo instrutor
+        InstrutorDtoResponse instrutorResponse = new InstrutorDtoResponse(
+                novoInstrutor.getMatricula(), novoInstrutor.getNome(), novoInstrutor.getEspecialidade(),
+                novoInstrutor.getEmail(), novoInstrutor.getTurmas());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(instrutorResponse);
     }
 
     // Consultando todos os Instrutores (GET)
     @GetMapping
-    public ResponseEntity<List<Instrutor>> getAllInstrutores() {
+    public ResponseEntity<List<InstrutorDtoResponse>> getAllInstrutores() {
         List<Instrutor> instrutores = instrutorRepository.findAll();
         if (instrutores.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        return ResponseEntity.ok(instrutores);
+
+        List<InstrutorDtoResponse> response = instrutores.stream()
+                .map(instrutor -> new InstrutorDtoResponse(
+                        instrutor.getMatricula(), instrutor.getNome(), instrutor.getEspecialidade(),
+                        instrutor.getEmail(), instrutor.getTurmas()))
+                .toList();
+
+        return ResponseEntity.ok(response);
     }
 
     // Consultando um Instrutor por ID (GET)
     @GetMapping("/{matricula}")
     public ResponseEntity<?> getInstrutorById(@PathVariable String matricula) {
         Optional<Instrutor> instrutor = instrutorRepository.findById(matricula);
-        if (!instrutor.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Instrutor não encontrado.");
+        if (instrutor.isEmpty()) {
+            return gerarErro("Instrutor não encontrado.", HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(instrutor.get());
+
+        // Adicionando o campo "turmas" à resposta
+        InstrutorDtoResponse response = new InstrutorDtoResponse(
+                instrutor.get().getMatricula(), instrutor.get().getNome(), instrutor.get().getEspecialidade(),
+                instrutor.get().getEmail(), instrutor.get().getTurmas());
+
+        return ResponseEntity.ok(response);
     }
 
     // Atualizando um Instrutor (PUT)
     @PutMapping("/{matricula}")
     public ResponseEntity<?> updateInstrutor(@PathVariable String matricula,
-            @Valid @RequestBody InstrutorDtoRequest instrutorRequest) {
+                                             @Valid @RequestBody InstrutorDtoRequest instrutorRequest) {
         Optional<Instrutor> existingInstrutor = instrutorRepository.findById(matricula);
-        if (!existingInstrutor.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Instrutor não encontrado.");
+        if (existingInstrutor.isEmpty()) {
+            return gerarErro("Instrutor não encontrado.", HttpStatus.NOT_FOUND);
         }
 
         Instrutor instrutorToUpdate = existingInstrutor.get();
@@ -107,15 +132,20 @@ public class InstrutorController {
         instrutorToUpdate.setEmail(instrutorRequest.getEmail());
 
         instrutorRepository.save(instrutorToUpdate);
-        return ResponseEntity.ok(instrutorToUpdate);
+
+        InstrutorDtoResponse response = new InstrutorDtoResponse(
+                instrutorToUpdate.getMatricula(), instrutorToUpdate.getNome(), instrutorToUpdate.getEspecialidade(),
+                instrutorToUpdate.getEmail(), instrutorToUpdate.getTurmas());
+
+        return ResponseEntity.ok(response);
     }
 
     // Deletando um Instrutor (DELETE)
     @DeleteMapping("/{matricula}")
     public ResponseEntity<?> deleteInstrutor(@PathVariable String matricula) {
         Optional<Instrutor> instrutor = instrutorRepository.findById(matricula);
-        if (!instrutor.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Instrutor não encontrado.");
+        if (instrutor.isEmpty()) {
+            return gerarErro("Instrutor não encontrado.", HttpStatus.NOT_FOUND);
         }
 
         instrutorRepository.delete(instrutor.get());
