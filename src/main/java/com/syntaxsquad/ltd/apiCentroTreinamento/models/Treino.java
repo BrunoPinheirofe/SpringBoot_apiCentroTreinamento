@@ -29,7 +29,7 @@ public class Treino {
     private Float cargaSugerida;
 
     // Relacionamento com Exercícios
-    @NotEmpty(message = "Treino deve ter pelo menos um exercício")
+  
     @OneToMany(mappedBy = "treino", cascade = CascadeType.ALL)
     private List<Exercicio> exercicios;
 
