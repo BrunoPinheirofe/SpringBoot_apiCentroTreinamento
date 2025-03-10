@@ -33,7 +33,7 @@ public class Instrutor {
     private List<Turma> turmas;
 
     @OneToOne
-    @PrimaryKeyJoinColumn
+    @JoinColumn(name = "email_user", referencedColumnName = "email", unique = true)
     private User user;
 
     @PrePersist
@@ -45,5 +45,14 @@ public class Instrutor {
         LocalDate date = LocalDate.now();
         int randomDigits = new Random().nextInt(9000) + 1000; // generates a 4-digit number
         return date.toString().replace("-", "") + randomDigits;
+    }
+    public void Instrutor() {
+    }
+
+    public Instrutor(String nome, String especialidade, String email, User user) {
+        this.nome = nome;
+        this.especialidade = especialidade;
+        this.email = email;
+        this.user = user;
     }
 }

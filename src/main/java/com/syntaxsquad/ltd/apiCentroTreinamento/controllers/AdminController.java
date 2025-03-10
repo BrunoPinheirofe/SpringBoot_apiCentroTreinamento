@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.AdministradorDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Administrador;
+import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
+import com.syntaxsquad.ltd.apiCentroTreinamento.models.Instrutor;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.User;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.UserRole;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AdministradorRepository;
@@ -36,11 +38,16 @@ public class AdminController {
     @PostMapping
     public ResponseEntity<?> createAdmin(@RequestBody AdministradorDtoRequest admin) {
 
-        // Verifica se o email já existe em qualquer banco de dados
-        if (userRepository.existsByEmail(admin.getEmail())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                 .body("Já existe um usuário com este email.");
-        }
+         // Verifica se já existe um usuário com o mesmo email nos repositórios de Aluno, Instrutor ou Administrador
+    
+    Optional<Aluno> existingAluno = alunoRepository.findByEmail(admin.getEmail());
+    Optional<Instrutor> existingInstrutor = instrutorRepository.findByEmail(admin.getEmail());
+    Optional<Administrador> existingAdmin = adminRepository.findByEmail(admin.getEmail());
+
+    if (existingAluno.isPresent() || existingInstrutor.isPresent() || existingAdmin.isPresent()) {
+        return ResponseEntity.badRequest().body("Já existe um usuário com este email.");
+    }
+
 
         // Verifica se o usuário com o email existe no banco de Users
         Optional<User> user = userRepository.findByEmail(admin.getEmail());

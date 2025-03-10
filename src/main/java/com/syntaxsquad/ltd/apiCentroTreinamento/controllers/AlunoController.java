@@ -3,15 +3,20 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.controllers;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.AlunoDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.UserRole;
+import com.syntaxsquad.ltd.apiCentroTreinamento.models.Administrador;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
+import com.syntaxsquad.ltd.apiCentroTreinamento.models.Instrutor;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.User;
+import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AdministradorRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.InstrutorRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.UserRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.services.AlunoService;
 import com.syntaxsquad.ltd.apiCentroTreinamento.services.UserService;
@@ -32,18 +37,34 @@ public class AlunoController {
     @Autowired
     private AlunoRepository alunoRepository;
 
+    @Autowired
+    private InstrutorRepository instrutorRepository;
+
+    @Autowired
+    private AdministradorRepository adminRepository;
+
     // Criar aluno
     @PostMapping
     public ResponseEntity<?> criarAluno(@Valid @RequestBody AlunoDtoRequest alunoRequest) {
-        // Verifica se já existe um usuário com o mesmo email
-        Optional<User> existingUser = userRepository.findByEmail(alunoRequest.getEmail());
 
-        if (existingUser.isPresent()) {
+        // Verifica se já existe um usuário com o mesmo email nos repositórios de Aluno,
+        // Instrutor ou Administrador
+        Optional<Aluno> existingAluno = alunoRepository.findByEmail(alunoRequest.getEmail());
+        Optional<Instrutor> existingInstrutor = instrutorRepository.findByEmail(alunoRequest.getEmail());
+        Optional<Administrador> existingAdmin = adminRepository.findByEmail(alunoRequest.getEmail());
+
+        if (existingAluno.isPresent() || existingInstrutor.isPresent()
+                || existingAdmin.isPresent()) {
             return ResponseEntity.badRequest().body("Já existe um usuário com este email.");
+        }
+        // Verifica se o usuário com o email existe no banco de Users
+        Optional<User> user = userRepository.findByEmail(alunoRequest.getEmail());
+        if (!user.isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Usuário não encontrado com este email.");
         }
 
         // Verifica se o usuário é um aluno
-        Optional<User> user = userRepository.findByEmail(alunoRequest.getEmail());
         if (user.isEmpty() || user.get().getRole() != UserRole.ALUNO) {
             return ResponseEntity.badRequest().body("Usuário não encontrado ou não tem permissão para ser aluno.");
         }
@@ -112,4 +133,10 @@ public class AlunoController {
         Iterable<Aluno> alunos = alunoRepository.findAll();
         return ResponseEntity.ok(alunos);
     }
+
+    @GetMapping("/api/alunos/test")
+    public ResponseEntity<String> testAlunosEndpoint() {
+        return ResponseEntity.ok("Aluno autenticado com sucesso!");
+    }
+
 }

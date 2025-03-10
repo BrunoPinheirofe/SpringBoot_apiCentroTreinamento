@@ -36,7 +36,7 @@ public class Administrador {
     private int idade;
 
     @OneToOne
-    @PrimaryKeyJoinColumn
+    @JoinColumn(name = "email_user", referencedColumnName = "email", unique = true)
     private User user;
 
     @PrePersist
@@ -61,6 +61,7 @@ public class Administrador {
         this.idade = idade;
         this.user = user;
     }
-
+    public Administrador() {
+    }
     
 }

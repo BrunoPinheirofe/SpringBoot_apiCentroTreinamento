@@ -29,30 +29,40 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
-                    // Autorização de aluno 
-                    .requestMatchers(HttpMethod.GET, "/api/exercicios/**").hasAuthority(UserRole.ALUNO.name())
-                    .requestMatchers(HttpMethod.GET, "/api/alunos/**").hasAuthority(UserRole.ALUNO.name())
-                    .requestMatchers(HttpMethod.GET, "/api/turmas/**").hasAuthority(UserRole.ALUNO.name())
-                    .requestMatchers(HttpMethod.GET, "/api/presencas/**").hasAuthority(UserRole.ALUNO.name())
-                    .requestMatchers(HttpMethod.GET, "/api/treinos").hasAuthority(UserRole.ALUNO.name())
-                    .requestMatchers(HttpMethod.GET, "/api/anamneses/**").hasAuthority(UserRole.ALUNO.name())
-                    .requestMatchers(HttpMethod.GET, "/api/planos/**").hasAuthority(UserRole.ALUNO.name())
-<<<<<<< HEAD
-                    // Autorização de treinador
-
+                    // Autorização para GET de exercícios, turmas, presenças, etc. para ALUNO, TREINADOR e ADMIN
+                    .requestMatchers(HttpMethod.GET, "/api/exercicios/**")
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.GET, "/api/alunos/**")
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Alunos também podem acessar
+                    .requestMatchers(HttpMethod.GET, "/api/turmas/**")
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Turmas
+                    .requestMatchers(HttpMethod.GET, "/api/presencas/**")
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Presenças
+                    .requestMatchers(HttpMethod.GET, "/api/treinos")
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Treinos
+                    .requestMatchers(HttpMethod.GET, "/api/anamneses/**")
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Anamneses
+                    .requestMatchers(HttpMethod.GET, "/api/planos/**")
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Planos
                     // Autorização de admin
-                    .requestMatchers( "/api/administradores/**").hasAuthority(UserRole.ADMIN.name())
-                    .requestMatchers( "/api/alunos/**").hasAuthority(UserRole.ADMIN.name())
-                    .requestMatchers( "/api/turmas/**").hasAuthority(UserRole.ADMIN.name())
-                    .requestMatchers( "/api/presencas/**").hasAuthority(UserRole.ADMIN.name())
-                    .requestMatchers( "/api/treinos/**").hasAuthority(UserRole.ADMIN.name())
-                    .requestMatchers( "/api/anamneses/**").hasAuthority(UserRole.ADMIN.name())
-                    .requestMatchers( "/api/planos/**").hasAuthority(UserRole.ADMIN.name())
-                    .requestMatchers( "/api/exercicios/**").hasAuthority(UserRole.ADMIN.name())
-                
-=======
-
->>>>>>> 9d8b04967e31f240a504a7e288009fc5279ded74
+                    .requestMatchers("/api/administradores/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/alunos/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/turmas/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/presencas/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/treinos/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/anamneses/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/planos/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/exercicios/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/instrutores/**")
+                        .hasAuthority(UserRole.ADMIN.name())
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

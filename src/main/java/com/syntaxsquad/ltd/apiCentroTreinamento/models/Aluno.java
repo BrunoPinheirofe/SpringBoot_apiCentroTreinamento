@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -73,7 +74,7 @@ public class Aluno {
     private String observacao;
 
     @OneToOne
-    @PrimaryKeyJoinColumn
+    @JoinColumn(name = "email_user", referencedColumnName = "email", unique = true)
     private User user;
 
     @PrePersist
@@ -97,4 +98,5 @@ public class Aluno {
         this.observacao = observacao;
         this.user = user;
     }
+    public Aluno(){}
 }
