@@ -5,6 +5,8 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AnamneseRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,7 @@ public class AnamneseController {
     private AlunoRepository alunoRepository;
 
     // Lista todas as anamneses
+    @Cacheable(value = "anamneses_all")
     @GetMapping
     public List<Anamnese> listarAnamneses() {
         return anamneseRepository.findAll();
@@ -36,6 +39,7 @@ public class AnamneseController {
     }
 
     // Cria nova anamnese
+    @CacheEvict(value = "anamneses_all", allEntries = true)
     @PostMapping("/alunos/{alunoId}")
     public ResponseEntity<?> criarAnamnese(
             @PathVariable String alunoMatricula,
@@ -59,6 +63,7 @@ public class AnamneseController {
     }
 
     // Atualiza anamnese
+    @CacheEvict(value = "anamneses_all", allEntries = true)
     @PutMapping("/{id}")
     public ResponseEntity<Anamnese> atualizarAnamnese(
             @PathVariable Long id,

@@ -7,6 +7,8 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.models.Treino;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.ExercicioRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.TreinoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ public class ExercicioController {
     }
 
     // Lista todos os exercícios
+    @Cacheable(value = "exercicios_all")
     @GetMapping
     public List<ExercicioResponseDto> listarExercicios() {
         return exercicioRepository.findAll().stream()
@@ -43,6 +46,7 @@ public class ExercicioController {
     }
 
     // Cria novo exercício
+    @CacheEvict(value = "exercicios_all", allEntries = true)
     @PostMapping("/treinos/{treinoId}")
     public ResponseEntity<ExercicioResponseDto> criarExercicio(@PathVariable Long treinoId, @RequestBody ExercicioRequestDto exercicioDto) {
         return treinoRepository.findById(treinoId)
@@ -60,6 +64,7 @@ public class ExercicioController {
     }
 
     // Atualiza exercício
+    @CacheEvict(value = "exercicios_all", allEntries = true)
     @PutMapping("/{id}")
     public ResponseEntity<ExercicioResponseDto> atualizarExercicio(@PathVariable Long id, @RequestBody ExercicioRequestDto exercicioDto) {
         if (!exercicioRepository.existsById(id)) {
@@ -79,6 +84,7 @@ public class ExercicioController {
     }
 
     // Busca exercícios por treino
+   
     @GetMapping("/treinos/{treinoId}")
     public ResponseEntity<List<ExercicioResponseDto>> buscarExerciciosPorTreino(@PathVariable Long treinoId) {
         Treino treino = treinoRepository.findById(treinoId).orElse(null);
@@ -102,6 +108,7 @@ public class ExercicioController {
     }
 
     // Deleta exercício
+    @CacheEvict(value = "exercicios_all", allEntries = true)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarExercicio(@PathVariable Long id) {
         if (!exercicioRepository.existsById(id)) {

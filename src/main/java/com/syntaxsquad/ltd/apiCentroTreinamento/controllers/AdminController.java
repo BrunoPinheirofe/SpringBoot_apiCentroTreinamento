@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +29,7 @@ public class AdminController {
 
     @Autowired
     private UserRepository userRepository;
-
+    @CacheEvict(value = "admins_all", allEntries = true)
     @PostMapping
     public ResponseEntity<?> createAdmin(@RequestBody AdministradorDtoRequest admin) {
         Optional<User> user = userRepository.findByEmail(admin.getEmail());
@@ -49,7 +51,7 @@ public class AdminController {
 
         return ResponseEntity.ok(adminDto);
     }
-
+    @CacheEvict(value = "admins_all", allEntries = true)
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAdmin(@PathVariable String id, @RequestBody AdministradorDtoRequest admin) {
         Optional<Administrador> existingAdmin = adminRepository.findById(id);
@@ -75,7 +77,7 @@ public class AdminController {
 
         return ResponseEntity.ok(adminDto);
     }
-
+    @CacheEvict(value = "admins_all", allEntries = true)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable String id) {
         Optional<Administrador> existingAdmin = adminRepository.findById(id);
@@ -106,6 +108,7 @@ public class AdminController {
     }
 
     @GetMapping
+    @Cacheable(value = "admins_all")
     public ResponseEntity<Iterable<AdminDtoResponse>> getAllAdmins() {
         Iterable<Administrador> admins = adminRepository.findAll();
         Iterable<AdminDtoResponse> adminsDto = StreamSupport.stream(admins.spliterator(), false)

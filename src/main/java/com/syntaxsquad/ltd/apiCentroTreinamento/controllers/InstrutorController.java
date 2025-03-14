@@ -1,6 +1,8 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -85,6 +87,7 @@ public class InstrutorController {
     }
 
     // Consultando todos os Instrutores (GET)
+    @Cacheable(value = "instrutores_all")
     @GetMapping
     public ResponseEntity<List<InstrutorDtoResponse>> getAllInstrutores() {
         List<Instrutor> instrutores = instrutorRepository.findAll();
@@ -118,6 +121,7 @@ public class InstrutorController {
     }
 
     // Atualizando um Instrutor (PUT)
+    @CacheEvict(value = "instrutores_all", allEntries = true)
     @PutMapping("/{matricula}")
     public ResponseEntity<?> updateInstrutor(@PathVariable String matricula,
                                              @Valid @RequestBody InstrutorDtoRequest instrutorRequest) {
@@ -141,6 +145,7 @@ public class InstrutorController {
     }
 
     // Deletando um Instrutor (DELETE)
+    @CacheEvict(value = "instrutores_all", allEntries = true)
     @DeleteMapping("/{matricula}")
     public ResponseEntity<?> deleteInstrutor(@PathVariable String matricula) {
         Optional<Instrutor> instrutor = instrutorRepository.findById(matricula);

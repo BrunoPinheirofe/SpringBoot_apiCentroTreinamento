@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -48,6 +50,7 @@ public class AlunoController {
     private AdministradorRepository adminRepository;
 
     // Criar aluno
+    @CacheEvict(value = "alunos_all", allEntries = true)
     @PostMapping
     public ResponseEntity<?> criarAluno(@Valid @RequestBody AlunoDtoRequest alunoRequest) {
 
@@ -93,6 +96,7 @@ public class AlunoController {
     }
 
     // Atualizar aluno
+    @CacheEvict(value = "alunos_all", allEntries = true)
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizarAluno(@PathVariable String id, @Valid @RequestBody AlunoDtoRequest alunoRequest) {
         Optional<Aluno> alunoExistente = alunoRepository.findById(id);
@@ -132,6 +136,7 @@ public class AlunoController {
     }
 
     // Remover aluno
+    @CacheEvict(value = "alunos_all", allEntries = true)
     @DeleteMapping("/{matricula}")
     public ResponseEntity<?> removerAluno(@PathVariable String matricula) {
         Optional<Aluno> alunoExistente = alunoRepository.findByMatricula(matricula);
@@ -161,6 +166,7 @@ public class AlunoController {
 
     // Listar todos os alunos
     @GetMapping
+    @Cacheable(value = "alunos_all")
     public ResponseEntity<Iterable<AlunoDtoResponse>> listarAlunos() {
         Iterable<Aluno> alunos = alunoRepository.findAll();
         Iterable<AlunoDtoResponse> alunosDtoResponse = StreamSupport

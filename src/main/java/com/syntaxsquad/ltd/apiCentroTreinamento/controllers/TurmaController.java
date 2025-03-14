@@ -12,6 +12,8 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.dto.TurmaDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.AlunoDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,7 @@ public class TurmaController {
     private InstrutorRepository instrutorRepository;
 
     // Lista todas as turmas
+    @Cacheable(value = "turmas_all")
     @GetMapping
     public ResponseEntity<List<TurmaResponseDTO>> listarTurmas() {
         try {
@@ -112,6 +115,7 @@ public class TurmaController {
     }
 
     // Cria nova turma
+    @CacheEvict(value = "turmas_all", allEntries = true)
     @PostMapping
     public ResponseEntity<TurmaResponseDTO> criarTurma(@RequestBody TurmaDtoRequest turmaRequest) {
         try {
@@ -172,6 +176,7 @@ public class TurmaController {
     
 
     // Adiciona aluno à turma
+    @CacheEvict(value = "turmas_all", allEntries = true)
     @PostMapping("/{turmaId}/alunos/{alunoMatricula}")
     public ResponseEntity<?> adicionarAluno(@PathVariable Long turmaId, @PathVariable String alunoMatricula) {
         try {
@@ -226,6 +231,7 @@ public class TurmaController {
     }
 
     // Remove aluno da turma
+    @CacheEvict(value = "turmas_all", allEntries = true)
     @DeleteMapping("/{turmaId}/alunos/{alunoMatricula}")
     public ResponseEntity<?> removerAluno(@PathVariable Long turmaId, @PathVariable String alunoMatricula) {
         try {

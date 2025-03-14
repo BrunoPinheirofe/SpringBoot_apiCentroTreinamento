@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +34,7 @@ public class TreinoController {
     private AlunoRepository alunoRepository;
 
     // Listar todos os treinos
+    @Cacheable(value = "treinos_all")
     @GetMapping
     public List<TreinoDtoResponse> listarTreinos() {
         return treinoRepository.findAll()
@@ -49,6 +52,7 @@ public class TreinoController {
     }
 
     // Criar um novo treino
+    @CacheEvict(value = "treinos_all", allEntries = true)
     @PostMapping
     public ResponseEntity<TreinoDtoResponse> criarTreino(@RequestBody TreinoDtoRequest treinoDto) {
         // Validação dos IDs de exercícios e alunos
@@ -62,7 +66,8 @@ public class TreinoController {
         List<Exercicio> exercicios = exercicioRepository.findAllById(treinoDto.getExerciciosIds());
 
         // Verificar se todos os IDs foram encontrados
-        if (alunos.size() != treinoDto.getAlunosIds().size() || exercicios.size() != treinoDto.getExerciciosIds().size()) {
+        if (alunos.size() != treinoDto.getAlunosIds().size()
+                || exercicios.size() != treinoDto.getExerciciosIds().size()) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -80,8 +85,10 @@ public class TreinoController {
     }
 
     // Adicionar um exercício a um treino existente
+    @CacheEvict(value = "treinos_all", allEntries = true)
     @PostMapping("/{treinoId}/exercicios/{exercicioId}")
-    public ResponseEntity<TreinoDtoResponse> adicionarExercicio(@PathVariable Long treinoId, @PathVariable Long exercicioId) {
+    public ResponseEntity<TreinoDtoResponse> adicionarExercicio(@PathVariable Long treinoId,
+            @PathVariable Long exercicioId) {
         Optional<Treino> treinoOptional = treinoRepository.findById(treinoId);
         Optional<Exercicio> exercicioOptional = exercicioRepository.findById(exercicioId);
 
@@ -108,23 +115,30 @@ public class TreinoController {
     }
 
     // Adicionar alunos a um treino existente
-    @PostMapping("/{treinoId}/alunos")
-    public ResponseEntity<TreinoDtoResponse> adicionarAlunos(@PathVariable Long treinoId, @RequestBody List<String> alunosIds) {
+    @CacheEvict(value = "treinos_all", allEntries = true)
+    @PostMapping("/{treinoId}/alunos/{alunosIds}")
+    public ResponseEntity<TreinoDtoResponse> adicionarAlunos(
+            @PathVariable Long treinoId, @PathVariable List<Long> alunosIds) {
+
         Optional<Treino> treinoOptional = treinoRepository.findById(treinoId);
-        if (treinoOptional.isPresent()) {
-            Treino treino = treinoOptional.get();
-            List<Aluno> alunos = alunoRepository.findByMatriculaIn(alunosIds);
-
-            // Verificar se todos os IDs de alunos foram encontrados
-            if (alunos.size() != alunosIds.size()) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            treino.setAlunos(alunos);
-            treinoRepository.save(treino);
-            return ResponseEntity.ok(new TreinoDtoResponse(treino));
+        if (treinoOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        Treino treino = treinoOptional.get();
+
+        // Buscar todos os alunos pelo ID
+        List<Aluno> alunos = alunoRepository.findAllByMatriculaIn(alunosIds);
+
+        if (alunos.isEmpty()) {
+            return ResponseEntity.badRequest().body(null); // Nenhum aluno encontrado
+        }
+
+        // Adiciona os alunos ao treino
+        treino.getAlunos().addAll(alunos);
+        treinoRepository.save(treino);
+
+        return ResponseEntity.ok(new TreinoDtoResponse(treino));
     }
 
     // Buscar treinos por grupo muscular
@@ -137,8 +151,10 @@ public class TreinoController {
     }
 
     // Atualizar um treino existente
+    @CacheEvict(value = "treinos_all", allEntries = true)
     @PutMapping("/{id}")
-    public ResponseEntity<TreinoDtoResponse> atualizarTreino(@PathVariable Long id, @RequestBody TreinoDtoRequest treinoDto) {
+    public ResponseEntity<TreinoDtoResponse> atualizarTreino(@PathVariable Long id,
+            @RequestBody TreinoDtoRequest treinoDto) {
         return treinoRepository.findById(id)
                 .map(treino -> {
                     treino.setNome(treinoDto.getNome());
@@ -151,6 +167,7 @@ public class TreinoController {
     }
 
     // Remover um exercício de um treino
+    @CacheEvict(value = "treinos_all", allEntries = true)
     @DeleteMapping("/{treinoId}/exercicios/{exercicioId}")
     public ResponseEntity<Void> removerExercicio(@PathVariable Long treinoId, @PathVariable Long exercicioId) {
         Optional<Treino> treinoOptional = treinoRepository.findById(treinoId);
@@ -165,6 +182,7 @@ public class TreinoController {
     }
 
     // Deletar um treino
+    @CacheEvict(value = "treinos_all", allEntries = true)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarTreino(@PathVariable Long id) {
         if (!treinoRepository.existsById(id)) {
