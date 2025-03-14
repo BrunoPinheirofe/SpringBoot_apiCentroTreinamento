@@ -39,16 +39,11 @@ public class Treino {
     @Column(name = "carga_sugerida")
     private Float cargaSugerida;
 
-    // Relacionamento com Exercícios
-    @ManyToMany
-    @JoinTable(
-        name = "treino_exercicio",
-        joinColumns = @JoinColumn(name = "treino_id"),
-        inverseJoinColumns = @JoinColumn(name = "exercicio_id")
-    )
+    // Relacionamento com Exercícios (um treino pode ter muitos exercícios)
+    @OneToMany(mappedBy = "treino", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Exercicio> exercicios;
 
-    // Relacionamento com Alunos
+    // Relacionamento com Alunos (um treino pode ter muitos alunos)
     @ManyToMany
     @JoinTable(
         name = "treino_aluno",
@@ -56,5 +51,4 @@ public class Treino {
         inverseJoinColumns = @JoinColumn(name = "aluno_id")
     )
     private List<Aluno> alunos;
-
 }

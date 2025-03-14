@@ -5,15 +5,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.TreinoDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.TreinoDtoResponse;
@@ -30,21 +24,23 @@ public class TreinoController {
 
     @Autowired
     private TreinoRepository treinoRepository;
-    
+
     @Autowired
     private ExercicioRepository exercicioRepository;
-    
+
     @Autowired
     private AlunoRepository alunoRepository;
 
+    // Listar todos os treinos
     @GetMapping
     public List<TreinoDtoResponse> listarTreinos() {
         return treinoRepository.findAll()
-                               .stream()
-                               .map(TreinoDtoResponse::new)
-                               .collect(Collectors.toList());
+                .stream()
+                .map(TreinoDtoResponse::new)
+                .collect(Collectors.toList());
     }
 
+    // Buscar treino por ID
     @GetMapping("/{id}")
     public ResponseEntity<TreinoDtoResponse> buscarTreinoPorId(@PathVariable Long id) {
         return treinoRepository.findById(id)
@@ -52,18 +48,30 @@ public class TreinoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Criar um novo treino
     @PostMapping
     public ResponseEntity<TreinoDtoResponse> criarTreino(@RequestBody TreinoDtoRequest treinoDto) {
-        if (treinoDto.getExerciciosIds() == null || treinoDto.getExerciciosIds().isEmpty()) {
+        // Validação dos IDs de exercícios e alunos
+        if (treinoDto.getExerciciosIds() == null || treinoDto.getExerciciosIds().isEmpty() ||
+                treinoDto.getAlunosIds() == null || treinoDto.getAlunosIds().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        Treino novoTreino = new Treino(treinoDto);
+        // Buscar alunos e exercícios no banco de dados
         List<Aluno> alunos = alunoRepository.findByMatriculaIn(treinoDto.getAlunosIds());
+        List<Exercicio> exercicios = exercicioRepository.findAllById(treinoDto.getExerciciosIds());
+
+        // Verificar se todos os IDs foram encontrados
+        if (alunos.size() != treinoDto.getAlunosIds().size() || exercicios.size() != treinoDto.getExerciciosIds().size()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Criar e salvar o novo treino
+        Treino novoTreino = new Treino(treinoDto);
         novoTreino.setAlunos(alunos);
         Treino treinoSalvo = treinoRepository.save(novoTreino);
 
-        List<Exercicio> exercicios = exercicioRepository.findAllById(treinoDto.getExerciciosIds());
+        // Associar exercícios ao treino
         exercicios.forEach(exercicio -> exercicio.setTreino(treinoSalvo));
         exercicioRepository.saveAll(exercicios);
         treinoSalvo.setExercicios(exercicios);
@@ -71,28 +79,47 @@ public class TreinoController {
         return ResponseEntity.ok(new TreinoDtoResponse(treinoSalvo));
     }
 
-    @PostMapping("/{treinoId}/exercicios")
-    public ResponseEntity<TreinoDtoResponse> adicionarExercicio(@PathVariable Long treinoId, @RequestBody Long exercicioId) {
+    // Adicionar um exercício a um treino existente
+    @PostMapping("/{treinoId}/exercicios/{exercicioId}")
+    public ResponseEntity<TreinoDtoResponse> adicionarExercicio(@PathVariable Long treinoId, @PathVariable Long exercicioId) {
         Optional<Treino> treinoOptional = treinoRepository.findById(treinoId);
         Optional<Exercicio> exercicioOptional = exercicioRepository.findById(exercicioId);
 
         if (treinoOptional.isPresent() && exercicioOptional.isPresent()) {
             Treino treino = treinoOptional.get();
             Exercicio exercicio = exercicioOptional.get();
+
+            // Verificar se o exercício já está associado a outro treino
+            if (exercicio.getTreino() != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build(); // Exercício já pertence a outro treino
+            }
+
+            // Associar o exercício ao treino
             exercicio.setTreino(treino);
             exercicioRepository.save(exercicio);
+
+            // Atualizar a lista de exercícios do treino
             treino.getExercicios().add(exercicio);
+            treinoRepository.save(treino);
+
             return ResponseEntity.ok(new TreinoDtoResponse(treino));
         }
         return ResponseEntity.notFound().build();
     }
 
+    // Adicionar alunos a um treino existente
     @PostMapping("/{treinoId}/alunos")
     public ResponseEntity<TreinoDtoResponse> adicionarAlunos(@PathVariable Long treinoId, @RequestBody List<String> alunosIds) {
         Optional<Treino> treinoOptional = treinoRepository.findById(treinoId);
         if (treinoOptional.isPresent()) {
             Treino treino = treinoOptional.get();
             List<Aluno> alunos = alunoRepository.findByMatriculaIn(alunosIds);
+
+            // Verificar se todos os IDs de alunos foram encontrados
+            if (alunos.size() != alunosIds.size()) {
+                return ResponseEntity.badRequest().build();
+            }
+
             treino.setAlunos(alunos);
             treinoRepository.save(treino);
             return ResponseEntity.ok(new TreinoDtoResponse(treino));
@@ -100,6 +127,7 @@ public class TreinoController {
         return ResponseEntity.notFound().build();
     }
 
+    // Buscar treinos por grupo muscular
     @GetMapping("/grupo/{grupoMuscular}")
     public List<TreinoDtoResponse> buscarTreinosPorGrupoMuscular(@PathVariable String grupoMuscular) {
         return treinoRepository.findByGrupoMuscularIgnoreCase(grupoMuscular)
@@ -108,6 +136,7 @@ public class TreinoController {
                 .collect(Collectors.toList());
     }
 
+    // Atualizar um treino existente
     @PutMapping("/{id}")
     public ResponseEntity<TreinoDtoResponse> atualizarTreino(@PathVariable Long id, @RequestBody TreinoDtoRequest treinoDto) {
         return treinoRepository.findById(id)
@@ -121,6 +150,7 @@ public class TreinoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Remover um exercício de um treino
     @DeleteMapping("/{treinoId}/exercicios/{exercicioId}")
     public ResponseEntity<Void> removerExercicio(@PathVariable Long treinoId, @PathVariable Long exercicioId) {
         Optional<Treino> treinoOptional = treinoRepository.findById(treinoId);
@@ -132,5 +162,16 @@ public class TreinoController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    // Deletar um treino
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarTreino(@PathVariable Long id) {
+        if (!treinoRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        treinoRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

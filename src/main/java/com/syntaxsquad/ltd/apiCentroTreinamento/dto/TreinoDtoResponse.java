@@ -1,7 +1,5 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
 
-import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
-import com.syntaxsquad.ltd.apiCentroTreinamento.models.Exercicio;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Treino;
 import lombok.Getter;
 
@@ -14,23 +12,23 @@ public class TreinoDtoResponse {
     private String nome;
     private String grupoMuscular;
     private Float cargaSugerida;
-    private List<String> alunos;
-    private List<String> exercicios;
+    private List<AlunoDTO> alunos;  // Lista de alunos com nome e matrícula
+    private List<ExercicioDtoResponse> exercicios;  // Lista de exercícios com nome e id
 
     public TreinoDtoResponse(Treino treino) {
         this.id = treino.getId();
         this.nome = treino.getNome();
         this.grupoMuscular = treino.getGrupoMuscular();
         this.cargaSugerida = treino.getCargaSugerida();
-        
-        // Convertendo a lista de alunos para uma lista de nomes
+
+        // Mapear alunos
         this.alunos = treino.getAlunos().stream()
-                .map(Aluno::getNome)  // Aqui você pode ajustar para o campo que desejar
+                .map(aluno -> new AlunoDTO(aluno))
                 .collect(Collectors.toList());
 
-        // Convertendo a lista de exercícios para uma lista de nomes
+        // Mapear exercícios
         this.exercicios = treino.getExercicios().stream()
-                .map(Exercicio::getNome)  // Aqui você pode ajustar para o campo que desejar
+                .map(exercicio -> new ExercicioDtoResponse(exercicio))
                 .collect(Collectors.toList());
     }
 }

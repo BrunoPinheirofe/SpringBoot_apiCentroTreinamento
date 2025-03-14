@@ -11,4 +11,6 @@ public interface InstrutorRepository extends JpaRepository<Instrutor, String> {
     boolean existsByEmail(String email);
 
     Optional<Instrutor> findByEmail(String email);
+
+    Instrutor findByMatricula(String string);
 }

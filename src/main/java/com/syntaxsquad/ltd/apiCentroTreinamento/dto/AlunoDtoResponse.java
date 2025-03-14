@@ -3,6 +3,7 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
 import java.time.LocalDate;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.SexoEnum;
+import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -49,5 +50,17 @@ public class AlunoDtoResponse {
         this.observacao = observacao;
     }
     
+    public AlunoDtoResponse( Aluno aluno ) {
+        this.matricula = aluno.getMatricula();
+        this.nome = aluno.getNome();
+        this.sobrenome = aluno.getSobrenome();
+        this.email = aluno.getEmail();
+        this.telefone = aluno.getTelefone();
+        this.dataNascimento = aluno.getDataNascimento();
+        this.dataCadastro = aluno.getDataCadastro();
+        this.idade = aluno.getIdade();
+        this.genero = aluno.getGenero();
+        this.observacao = aluno.getObservacao();
+    }
 
 }

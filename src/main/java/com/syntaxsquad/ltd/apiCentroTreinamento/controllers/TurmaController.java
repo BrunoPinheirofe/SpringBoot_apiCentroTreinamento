@@ -8,6 +8,7 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.InstrutorRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.TurmaResponseDTO;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.InstrutorDTO;
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.TurmaDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.AlunoDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,35 +113,45 @@ public class TurmaController {
 
     // Cria nova turma
     @PostMapping
-    public ResponseEntity<TurmaResponseDTO> criarTurma(@RequestBody Turma turma) {
+    public ResponseEntity<TurmaResponseDTO> criarTurma(@RequestBody TurmaDtoRequest turmaRequest) {
         try {
             // Verifica se já existe turma no mesmo horário
-            if (!turmaRepository.findByDiaSemanaAndHorario(turma.getDiaSemana(), turma.getHorario()).isEmpty()) {
+            if (!turmaRepository.findByDiaSemanaAndHorario(turmaRequest.getDiaSemana(), turmaRequest.getHorario()).isEmpty()) {
                 return ResponseEntity.badRequest().body(null); // BadRequest se já existir turma no mesmo horário
             }
-
+    
             // Verifica se o instrutor existe
-            Instrutor instrutor = instrutorRepository.findById(turma.getInstrutor().getMatricula()).orElse(null);
+            Instrutor instrutor = instrutorRepository.findByMatricula(turmaRequest.getInstrutorId().toString());
             if (instrutor == null) {
                 return ResponseEntity.badRequest().body(null); // Retorna erro caso não encontre o instrutor
             }
-
+    
+            // Cria a turma
+            Turma turma = new Turma();
+            turma.setNome(turmaRequest.getNome());
+            turma.setHorario(turmaRequest.getHorario());
+            turma.setDiaSemana(turmaRequest.getDiaSemana());
             turma.setInstrutor(instrutor); // Associa o instrutor à turma
+    
+            // Adiciona os alunos à turma
+            List<Aluno> alunos = alunoRepository.findByMatriculaIn(turmaRequest.getSIds()); // Buscar todos os alunos pelos CPFs
+            turma.setAlunos(alunos);
+    
             turma = turmaRepository.save(turma); // Salva a turma
-
+    
             // Cria o DTO para a resposta
             TurmaResponseDTO responseDTO = new TurmaResponseDTO();
             responseDTO.setId(turma.getId());
             responseDTO.setNome(turma.getNome());
             responseDTO.setHorario(turma.getHorario());
             responseDTO.setDiaSemana(turma.getDiaSemana());
-
+    
             // Setando o instrutor no DTO
             InstrutorDTO instrutorDTO = new InstrutorDTO();
             instrutorDTO.setMatricula(turma.getInstrutor().getMatricula());
             instrutorDTO.setNome(turma.getInstrutor().getNome());
             responseDTO.setInstrutor(instrutorDTO);
-
+    
             // Setando os alunos no DTO
             List<AlunoDTO> alunosDTO = turma.getAlunos().stream()
                     .map(aluno -> {
@@ -151,13 +162,14 @@ public class TurmaController {
                     })
                     .collect(Collectors.toList());
             responseDTO.setAlunos(alunosDTO);
-
+    
             return ResponseEntity.ok(responseDTO);
-
+    
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
     }
+    
 
     // Adiciona aluno à turma
     @PostMapping("/{turmaId}/alunos/{alunoMatricula}")
@@ -255,104 +267,6 @@ public class TurmaController {
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro ao remover aluno: " + e.getMessage());
-        }
-    }
-
-    // Busca turmas por dia da semana
-    @GetMapping("/dia/{diaSemana}")
-    public ResponseEntity<List<TurmaResponseDTO>> buscarTurmasPorDia(@PathVariable String diaSemana) {
-        try {
-            List<Turma> turmas = turmaRepository.findByDiaSemana(diaSemana);
-            List<TurmaResponseDTO> response = turmas.stream()
-                    .map(turma -> {
-                        TurmaResponseDTO responseDTO = new TurmaResponseDTO();
-                        responseDTO.setId(turma.getId());
-                        responseDTO.setNome(turma.getNome());
-                        responseDTO.setHorario(turma.getHorario());
-                        responseDTO.setDiaSemana(turma.getDiaSemana());
-
-                        // Setando o instrutor no DTO
-                        InstrutorDTO instrutorDTO = new InstrutorDTO();
-                        Instrutor instrutor = turma.getInstrutor();
-                        instrutorDTO.setMatricula(instrutor.getMatricula());
-                        instrutorDTO.setNome(instrutor.getNome());
-                        responseDTO.setInstrutor(instrutorDTO);
-
-                        // Setando os alunos no DTO
-                        List<AlunoDTO> alunosDTO = turma.getAlunos().stream()
-                                .map(aluno -> {
-                                    AlunoDTO alunoDTO = new AlunoDTO();
-                                    alunoDTO.setMatricula(aluno.getMatricula());
-                                    alunoDTO.setNome(aluno.getNome());
-                                    return alunoDTO;
-                                })
-                                .collect(Collectors.toList());
-                        responseDTO.setAlunos(alunosDTO);
-
-                        return responseDTO;
-                    })
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
-    // Atualiza turma
-    @PutMapping("/{id}")
-    public ResponseEntity<TurmaResponseDTO> atualizarTurma(@PathVariable Long id, @RequestBody Turma turma) {
-        try {
-            return turmaRepository.findById(id)
-                    .map(turmaExistente -> {
-                        turmaExistente.setNome(turma.getNome());
-                        turmaExistente.setHorario(turma.getHorario());
-                        turmaExistente.setDiaSemana(turma.getDiaSemana());
-
-                        turmaExistente = turmaRepository.save(turmaExistente); // Atualiza turma
-
-                        TurmaResponseDTO responseDTO = new TurmaResponseDTO();
-                        responseDTO.setId(turmaExistente.getId());
-                        responseDTO.setNome(turmaExistente.getNome());
-                        responseDTO.setHorario(turmaExistente.getHorario());
-                        responseDTO.setDiaSemana(turmaExistente.getDiaSemana());
-
-                        // Setando o instrutor no DTO
-                        InstrutorDTO instrutorDTO = new InstrutorDTO();
-                        instrutorDTO.setMatricula(turmaExistente.getInstrutor().getMatricula());
-                        instrutorDTO.setNome(turmaExistente.getInstrutor().getNome());
-                        responseDTO.setInstrutor(instrutorDTO);
-
-                        // Setando os alunos no DTO
-                        List<AlunoDTO> alunosDTO = turmaExistente.getAlunos().stream()
-                                .map(aluno -> {
-                                    AlunoDTO alunoDTO = new AlunoDTO();
-                                    alunoDTO.setMatricula(aluno.getMatricula());
-                                    alunoDTO.setNome(aluno.getNome());
-                                    return alunoDTO;
-                                })
-                                .collect(Collectors.toList());
-                        responseDTO.setAlunos(alunosDTO);
-
-                        return ResponseEntity.ok(responseDTO);
-                    })
-                    .orElse(ResponseEntity.notFound().build());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
-    }
-
-    // Exclui turma
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluirTurma(@PathVariable Long id) {
-        try {
-            if (turmaRepository.existsById(id)) {
-                turmaRepository.deleteById(id);
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
         }
     }
 }

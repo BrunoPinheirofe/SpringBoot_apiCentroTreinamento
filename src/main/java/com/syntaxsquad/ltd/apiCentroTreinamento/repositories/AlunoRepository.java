@@ -34,5 +34,6 @@ public interface AlunoRepository extends JpaRepository<Aluno, String> {
 
     List<Aluno> findByMatriculaIn(List<String> matriculas);
 
+    
 
 } 
