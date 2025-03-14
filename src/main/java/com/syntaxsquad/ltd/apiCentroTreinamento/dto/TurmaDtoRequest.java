@@ -22,5 +22,5 @@ public class TurmaDtoRequest {
     @NotNull(message = "Instrutor é obrigatório")
     private Long instrutorId;
 
-    private List<Long> alunosIds; // Lista de alunos que podem ser adicionados à turma
+    private List<String>sIds; // Lista de alunos que podem ser adicionados à turma
 }

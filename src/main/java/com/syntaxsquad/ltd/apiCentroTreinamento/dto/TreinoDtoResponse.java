@@ -1,52 +1,36 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
 
-import java.util.List;
+import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
+import com.syntaxsquad.ltd.apiCentroTreinamento.models.Exercicio;
+import com.syntaxsquad.ltd.apiCentroTreinamento.models.Treino;
+import lombok.Getter;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Getter
 public class TreinoDtoResponse {
     private Long id;
     private String nome;
     private String grupoMuscular;
     private Float cargaSugerida;
-    private List<ExercicioResponseDto> exercicios; // Lista de exercícios
+    private List<String> alunos;
+    private List<String> exercicios;
 
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
+    public TreinoDtoResponse(Treino treino) {
+        this.id = treino.getId();
+        this.nome = treino.getNome();
+        this.grupoMuscular = treino.getGrupoMuscular();
+        this.cargaSugerida = treino.getCargaSugerida();
+        
+        // Convertendo a lista de alunos para uma lista de nomes
+        this.alunos = treino.getAlunos().stream()
+                .map(Aluno::getNome)  // Aqui você pode ajustar para o campo que desejar
+                .collect(Collectors.toList());
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getGrupoMuscular() {
-        return grupoMuscular;
-    }
-
-    public void setGrupoMuscular(String grupoMuscular) {
-        this.grupoMuscular = grupoMuscular;
-    }
-
-    public Float getCargaSugerida() {
-        return cargaSugerida;
-    }
-
-    public void setCargaSugerida(Float cargaSugerida) {
-        this.cargaSugerida = cargaSugerida;
-    }
-
-    public List<ExercicioResponseDto> getExercicios() {
-        return exercicios;
-    }
-
-    public void setExercicios(List<ExercicioResponseDto> exercicios) {
-        this.exercicios = exercicios;
+        // Convertendo a lista de exercícios para uma lista de nomes
+        this.exercicios = treino.getExercicios().stream()
+                .map(Exercicio::getNome)  // Aqui você pode ajustar para o campo que desejar
+                .collect(Collectors.toList());
     }
 }

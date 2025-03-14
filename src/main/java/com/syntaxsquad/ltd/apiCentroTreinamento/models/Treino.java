@@ -3,13 +3,24 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.TreinoDtoRequest;
+
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = "treinos")
 public class Treino {
+
+    public Treino(TreinoDtoRequest treinoDto) {
+        this.nome = treinoDto.getNome();
+        this.grupoMuscular = treinoDto.getGrupoMuscular();
+        this.cargaSugerida = treinoDto.getCargaSugerida();
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,8 +40,21 @@ public class Treino {
     private Float cargaSugerida;
 
     // Relacionamento com Exercícios
-  
-    @OneToMany(mappedBy = "treino", cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+        name = "treino_exercicio",
+        joinColumns = @JoinColumn(name = "treino_id"),
+        inverseJoinColumns = @JoinColumn(name = "exercicio_id")
+    )
     private List<Exercicio> exercicios;
 
-} 
+    // Relacionamento com Alunos
+    @ManyToMany
+    @JoinTable(
+        name = "treino_aluno",
+        joinColumns = @JoinColumn(name = "treino_id"),
+        inverseJoinColumns = @JoinColumn(name = "aluno_id")
+    )
+    private List<Aluno> alunos;
+
+}

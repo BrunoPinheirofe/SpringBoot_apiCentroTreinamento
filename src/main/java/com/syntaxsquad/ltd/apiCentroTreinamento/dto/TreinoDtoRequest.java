@@ -23,6 +23,11 @@ public class TreinoDtoRequest {
     @NotEmpty(message = "A lista de IDs dos exercícios não pode ser vazia")
     private List<Long> exerciciosIds; // Lista de IDs dos exercícios
 
+    @NotEmpty(message = "A lista de IDs dos exercícios não pode ser vazia")
+    private List<String> alunosIds; // Lista de IDs dos alunos
+
+
+
     // Getters e Setters
     public String getNome() {
         return nome;
@@ -30,6 +35,14 @@ public class TreinoDtoRequest {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public List<String> getAlunosIds() {
+        return alunosIds;
+    }
+
+    public void setAlunosIds(List<String> alunosIds) {
+        this.alunosIds = alunosIds;
     }
 
     public String getGrupoMuscular() {
@@ -55,4 +68,11 @@ public class TreinoDtoRequest {
     public void setExerciciosIds(List<Long> exerciciosIds) {
         this.exerciciosIds = exerciciosIds;
     }
+
+   
+
+
+
+   
+
 }
