@@ -2,9 +2,15 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+
 @Data
+@Getter
+@Setter
 public class TurmaDtoRequest {
 
     @NotBlank(message = "Nome é obrigatório")
