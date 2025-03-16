@@ -20,8 +20,7 @@ public class ApiCentroTreinamentoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ApiCentroTreinamentoApplication.class, args);
-		DecodificarQrCode qrcode = new DecodificarQrCode();
-		qrcode.qrcode("", "qrcode.png");
+		
 	}
 
 
