@@ -1,3 +1,11 @@
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
 spring:
   application:
     name: apiCentroTreinamento
@@ -16,5 +24,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
 jwt:
   secret: ${SECRET_KEY}
+
+
+mercado:
+  pago:
+    access:
+      token: ${MERCADO_PAGO_ACCESS_TOKEN}

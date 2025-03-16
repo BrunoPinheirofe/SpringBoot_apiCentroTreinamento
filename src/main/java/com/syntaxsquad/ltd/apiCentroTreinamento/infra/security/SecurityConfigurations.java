@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 @Configuration
 public class SecurityConfigurations {
@@ -22,8 +23,10 @@ public class SecurityConfigurations {
         this.jwtFilter = jwtFilter;
     }
 
+    
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -44,6 +47,7 @@ public class SecurityConfigurations {
                         .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Anamneses
                     .requestMatchers(HttpMethod.GET, "/api/planos/**")
                         .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Planos
+                  
                     // Autorização de admin
                     .requestMatchers("/api/administradores/**")
                         .hasAuthority(UserRole.ADMIN.name())
@@ -63,18 +67,25 @@ public class SecurityConfigurations {
                         .hasAuthority(UserRole.ADMIN.name())
                     .requestMatchers("/api/instrutores/**")
                         .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/api/mercado-pago/**")
+                        .hasAuthority(UserRole.ADMIN.name())
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+  
+
+    
 }

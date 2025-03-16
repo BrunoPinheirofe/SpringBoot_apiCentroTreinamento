@@ -2,19 +2,24 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Data
+
 @Entity
 @Table(name = "pagamentos")
+@Getter
+@Setter
 public class Pagamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "valor_pago", nullable = false)
-    private BigDecimal valorPago;
+    @Column(name = "valor_pago")
+    private BigDecimal valorPago = BigDecimal.ZERO;
 
     @Column(name = "data_pagamento")
     private LocalDate dataPagamento;

@@ -2,10 +2,11 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
 
 
 
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PositiveOrZero;
+
+
 
 import java.util.List;
 

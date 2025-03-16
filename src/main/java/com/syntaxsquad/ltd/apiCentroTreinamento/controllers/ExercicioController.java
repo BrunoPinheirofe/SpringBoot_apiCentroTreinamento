@@ -6,7 +6,6 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.models.Exercicio;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Treino;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.ExercicioRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.TreinoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ public class ExercicioController {
     private final ExercicioRepository exercicioRepository;
     private final TreinoRepository treinoRepository;
 
-    @Autowired
     public ExercicioController(ExercicioRepository exercicioRepository, TreinoRepository treinoRepository) {
         this.exercicioRepository = exercicioRepository;
         this.treinoRepository = treinoRepository;
