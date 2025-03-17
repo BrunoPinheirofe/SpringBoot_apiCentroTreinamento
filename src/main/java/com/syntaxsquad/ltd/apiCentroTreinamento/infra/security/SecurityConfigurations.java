@@ -31,9 +31,11 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
+                    .requestMatchers(HttpMethod.POST, "api/auth/login", "api/auth/register").permitAll()
                     // Autorização para GET de exercícios, turmas, presenças, etc. para ALUNO, TREINADOR e ADMIN
                     .requestMatchers(HttpMethod.GET, "/api/exercicios/**")
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name())
+                    .requestMatchers("/api/auth/**")
                         .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name())
                     .requestMatchers(HttpMethod.GET, "/api/alunos/**")
                         .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Alunos também podem acessar

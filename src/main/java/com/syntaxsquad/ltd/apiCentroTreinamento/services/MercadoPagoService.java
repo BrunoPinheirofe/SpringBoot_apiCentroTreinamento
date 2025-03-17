@@ -170,6 +170,7 @@ public class MercadoPagoService {
         MercadoPagoConfig.setAccessToken(ACCESS_TOKEN);
 
         PaymentClient client = new PaymentClient();
+        
         try {
             // Obter o pagamento pelo ID
             Payment payment = client.get(id);
@@ -188,4 +189,5 @@ public class MercadoPagoService {
             return new PagamentoStatusResponse("Erro ao consultar status", null);
         }
     }
+    
 }

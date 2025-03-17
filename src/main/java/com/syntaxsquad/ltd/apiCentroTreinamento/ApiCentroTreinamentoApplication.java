@@ -4,10 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.syntaxsquad.ltd.apiCentroTreinamento.services.DecodificarQrCode;
-
-import jakarta.persistence.Cacheable;
 
 
 
@@ -15,6 +13,7 @@ import jakarta.persistence.Cacheable;
 @SpringBootApplication
 @EnableCaching
 @EnableSpringDataWebSupport
+@EnableScheduling
 
 public class ApiCentroTreinamentoApplication {
 

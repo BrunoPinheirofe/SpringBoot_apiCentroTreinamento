@@ -13,7 +13,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/centro_treinamento_db
     username: postgres
-    password: 2004
+    password: 2004  
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -25,11 +25,27 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-jwt:
-  secret: ${SECRET_KEY}
 
+mail:
+    host: smtp.mailtrap.io
+    port: 587
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.ssl.trust: smtp.mailtrap.io
+      mail.smtp.debug: true
+      mail.transport.protocol: smtp
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 30000
+      mail.smtp.writetimeout: 5000
+      mail.smtp.connection.timeout: 5000
+      
+
+
+jwt:
+  secret: ${SECRET_KEY}  # Definir no ambiente
 
 mercado:
   pago:
     access:
-      token: ${MERCADO_PAGO_ACCESS_TOKEN}
+      token: ${MERCADO_PAGO_ACCESS_TOKEN}  # Definir no ambiente

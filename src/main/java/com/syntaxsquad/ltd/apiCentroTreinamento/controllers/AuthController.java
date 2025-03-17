@@ -1,15 +1,19 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.controllers;
 
+import com.google.common.base.Optional;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.UsersDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.User;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.UserRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.services.UserService;
+
+import jakarta.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
@@ -39,5 +43,14 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(token);  // Retorna o token caso a autenticação seja bem-sucedida
+    }
+    @PutMapping("/recuperar-senha/{email}")
+    public ResponseEntity<String> recuperarSenha(@PathVariable String email) throws MessagingException {
+        java.util.Optional<User> user = userService.recuperaSenha(email);
+        if (user.isPresent()) {
+            return ResponseEntity.ok("Senha redefinida com sucesso"); // Retorna status 200 se a senha for redefinida com sucesso
+        } else {
+            return ResponseEntity.status(404).body("Usuário nao encontrado"); // Retorna status 404 se o usuário nao for encontrado
+        }
     }
 }

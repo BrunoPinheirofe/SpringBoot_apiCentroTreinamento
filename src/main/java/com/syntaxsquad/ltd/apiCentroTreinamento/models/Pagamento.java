@@ -15,8 +15,7 @@ import java.time.LocalDate;
 @Setter
 public class Pagamento {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(name = "valor_pago")
     private BigDecimal valorPago = BigDecimal.ZERO;

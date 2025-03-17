@@ -74,7 +74,6 @@
     <version>2.1.29</version>
 </dependency>
 
-
         <!-- Outras dependências -->
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -101,6 +100,11 @@
     <artifactId>javase</artifactId>
     <version>3.5.2</version>
 </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+
     </dependencies>
 
     <build>
