@@ -3,16 +3,17 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
 import java.util.List;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Turma;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 
 public class InstrutorDtoResponse {
-    private String matricula;
+    private Matricula matricula;
     private String nome;
     private String especialidade;
     private String email;
     private List<Turma> turmas;
 
     // Constructor with all fields
-    public InstrutorDtoResponse(String matricula, String nome, String especialidade, String email, List<Turma> turmas) {
+    public InstrutorDtoResponse(Matricula matricula, String nome, String especialidade, String email, List<Turma> turmas) {
         this.matricula = matricula;
         this.nome = nome;
         this.especialidade = especialidade;
@@ -21,11 +22,11 @@ public class InstrutorDtoResponse {
     }
 
     // Getters and setters for each field
-    public String getMatricula() {
+    public Matricula getMatricula() {
         return matricula;
     }
 
-    public void setMatricula(String matricula) {
+    public void setMatricula(Matricula matricula) {
         this.matricula = matricula;
     }
 

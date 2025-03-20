@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.util.List;
 
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
+
 
 @Data
 @Getter
@@ -26,7 +28,7 @@ public class TurmaDtoRequest {
     private String diaSemana;
 
     @NotNull(message = "Instrutor é obrigatório")
-    private Long instrutorId;
+    private Matricula instrutorId;
 
-    private List<String>sIds; // Lista de alunos que podem ser adicionados à turma
+    private List<Matricula>sIds; // Lista de alunos que podem ser adicionados à turma
 }

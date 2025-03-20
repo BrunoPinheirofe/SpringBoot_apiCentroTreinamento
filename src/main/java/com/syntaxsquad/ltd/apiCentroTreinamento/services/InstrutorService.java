@@ -2,6 +2,8 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.services;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Instrutor;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.InstrutorRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ public class InstrutorService {
         return instrutorRepository.save(instrutor);
     }
 
-    public Instrutor findByMatricula(String matricula) {
+    public Instrutor findByMatricula(Matricula matricula) {
         return instrutorRepository.findById(matricula).orElse(null);
     }
 }

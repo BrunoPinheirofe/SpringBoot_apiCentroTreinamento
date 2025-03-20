@@ -18,6 +18,7 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AdministradorReposi
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.InstrutorRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.UserRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -106,7 +107,7 @@ public class InstrutorController {
 
     // Consultando um Instrutor por ID (GET)
     @GetMapping("/{matricula}")
-    public ResponseEntity<?> getInstrutorById(@PathVariable String matricula) {
+    public ResponseEntity<?> getInstrutorById(@PathVariable Matricula matricula) {
         Optional<Instrutor> instrutor = instrutorRepository.findById(matricula);
         if (instrutor.isEmpty()) {
             return gerarErro("Instrutor não encontrado.", HttpStatus.NOT_FOUND);
@@ -123,7 +124,7 @@ public class InstrutorController {
     // Atualizando um Instrutor (PUT)
     @CacheEvict(value = "instrutores_all", allEntries = true)
     @PutMapping("/{matricula}")
-    public ResponseEntity<?> updateInstrutor(@PathVariable String matricula,
+    public ResponseEntity<?> updateInstrutor(@PathVariable Matricula matricula,
                                              @Valid @RequestBody InstrutorDtoRequest instrutorRequest) {
         Optional<Instrutor> existingInstrutor = instrutorRepository.findById(matricula);
         if (existingInstrutor.isEmpty()) {
@@ -147,7 +148,7 @@ public class InstrutorController {
     // Deletando um Instrutor (DELETE)
     @CacheEvict(value = "instrutores_all", allEntries = true)
     @DeleteMapping("/{matricula}")
-    public ResponseEntity<?> deleteInstrutor(@PathVariable String matricula) {
+    public ResponseEntity<?> deleteInstrutor(@PathVariable Matricula matricula) {
         Optional<Instrutor> instrutor = instrutorRepository.findById(matricula);
         if (instrutor.isEmpty()) {
             return gerarErro("Instrutor não encontrado.", HttpStatus.NOT_FOUND);

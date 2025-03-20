@@ -5,16 +5,24 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+    tagsSorter: alpha
+    operationsSorter: method
+    doc-expansion: none
+    filter: true
+    disable-swagger-default-url: true
+  show-actuator: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
 
 spring:
   application:
-    name: apiCentroTreinamento
+    name: centro_treinamento
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/centro_treinamento_db
-    username: postgres
-    password: 2004  
-    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -25,27 +33,30 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-
-mail:
-    host: smtp.mailtrap.io
-    port: 587
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-      mail.smtp.ssl.trust: smtp.mailtrap.io
-      mail.smtp.debug: true
-      mail.transport.protocol: smtp
-      mail.smtp.connectiontimeout: 5000
-      mail.smtp.timeout: 30000
-      mail.smtp.writetimeout: 5000
-      mail.smtp.connection.timeout: 5000
-      
-
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.mailtrap.io
+        transport:
+          protocol: smtp
+          connectiontimeout: 5000
+          writetimeout: 5000
+          timeout: 30000
+          connection.timeout: 5000
 
 jwt:
-  secret: ${SECRET_KEY}  # Definir no ambiente
+  secret: ${SECRET_KEY}
 
 mercado:
   pago:
     access:
-      token: ${MERCADO_PAGO_ACCESS_TOKEN}  # Definir no ambiente
+      token: ${MERCADO_PAGO_ACCESS_TOKEN}

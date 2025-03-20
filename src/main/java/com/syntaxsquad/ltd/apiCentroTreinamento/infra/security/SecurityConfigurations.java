@@ -23,8 +23,6 @@ public class SecurityConfigurations {
         this.jwtFilter = jwtFilter;
     }
 
-    
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -71,7 +69,12 @@ public class SecurityConfigurations {
                         .hasAuthority(UserRole.ADMIN.name())
                     .requestMatchers("/api/mercado-pago/**")
                         .hasAuthority(UserRole.ADMIN.name())
-                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/v2/api-docs/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**").permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -86,6 +89,8 @@ public class SecurityConfigurations {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 
   
 

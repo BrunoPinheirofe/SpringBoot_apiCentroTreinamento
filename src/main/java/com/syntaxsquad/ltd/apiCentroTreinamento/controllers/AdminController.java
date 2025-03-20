@@ -19,6 +19,7 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.models.User;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.UserRole;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AdministradorRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.UserRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 
 @RestController
 @RequestMapping("/api/administradores")
@@ -53,8 +54,8 @@ public class AdminController {
     }
     @CacheEvict(value = "admins_all", allEntries = true)
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAdmin(@PathVariable String id, @RequestBody AdministradorDtoRequest admin) {
-        Optional<Administrador> existingAdmin = adminRepository.findById(id);
+    public ResponseEntity<?> updateAdmin(@PathVariable Matricula id, @RequestBody AdministradorDtoRequest admin) {
+        Optional<Administrador> existingAdmin = adminRepository.findByMatricula(id);
         if (existingAdmin.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorDto("Erro: Administrador não encontrado."));
@@ -79,7 +80,7 @@ public class AdminController {
     }
     @CacheEvict(value = "admins_all", allEntries = true)
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAdmin(@PathVariable String id) {
+    public ResponseEntity<?> deleteAdmin(@PathVariable Matricula id) {
         Optional<Administrador> existingAdmin = adminRepository.findById(id);
         if (existingAdmin.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -91,7 +92,7 @@ public class AdminController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAdminById(@PathVariable String id) {
+    public ResponseEntity<?> getAdminById(@PathVariable Matricula id) {
         Optional<Administrador> admin = adminRepository.findById(id);
         if (admin.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

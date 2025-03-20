@@ -6,13 +6,15 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.util.Random;
 
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
+
 @Data
 @Entity
 @Table(name = "administradores")
 public class Administrador {
     @Id
-    @Column(unique = true, nullable = false)
-    private String matricula;
+    @Embedded
+    private Matricula matricula;
 
     @Column(nullable = false)
     private String nome;
@@ -41,13 +43,7 @@ public class Administrador {
 
     @PrePersist
     protected void onCreate() {
-        this.matricula = generateMatricula();
-    }
-
-    private String generateMatricula() {
-        LocalDate date = LocalDate.now();
-        int randomDigits = new Random().nextInt(9000) + 1000; // generates a 4-digit number
-        return date.toString().replace("-", "") + randomDigits;
+        this.matricula = Matricula.gerarMatricula();
     }
 
     public Administrador(String nome, String sobrenome, String email, String telefone, LocalDate dataNascimento,

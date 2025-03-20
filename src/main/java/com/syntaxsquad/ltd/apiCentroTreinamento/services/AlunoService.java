@@ -2,6 +2,8 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.services;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ public class AlunoService {
         return alunoRepository.save(aluno);
     }
 
-    public Aluno findByMatricula(String matricula) {
+    public Aluno findByMatricula(Matricula matricula) {
         return alunoRepository.findById(matricula).orElse(null);
     }
 

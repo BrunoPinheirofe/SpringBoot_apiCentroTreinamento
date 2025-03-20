@@ -4,6 +4,7 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.models.Turma;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Instrutor;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.TurmaRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.InstrutorRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.TurmaResponseDTO;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -125,8 +127,8 @@ public class TurmaController {
             }
     
             // Verifica se o instrutor existe
-            Instrutor instrutor = instrutorRepository.findByMatricula(turmaRequest.getInstrutorId().toString());
-            if (instrutor == null) {
+            Optional<Instrutor> instrutorOpt = instrutorRepository.findByMatricula(turmaRequest.getInstrutorId());
+            if (instrutorOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body(null); // Retorna erro caso não encontre o instrutor
             }
     
@@ -135,7 +137,7 @@ public class TurmaController {
             turma.setNome(turmaRequest.getNome());
             turma.setHorario(turmaRequest.getHorario());
             turma.setDiaSemana(turmaRequest.getDiaSemana());
-            turma.setInstrutor(instrutor); // Associa o instrutor à turma
+            turma.setInstrutor(instrutorOpt.get()); // Associa o instrutor à turma
     
             // Adiciona os alunos à turma
             List<Aluno> alunos = alunoRepository.findByMatriculaIn(turmaRequest.getSIds()); // Buscar todos os alunos pelos CPFs
@@ -178,7 +180,7 @@ public class TurmaController {
     // Adiciona aluno à turma
     @CacheEvict(value = "turmas_all", allEntries = true)
     @PostMapping("/{turmaId}/alunos/{alunoMatricula}")
-    public ResponseEntity<?> adicionarAluno(@PathVariable Long turmaId, @PathVariable String alunoMatricula) {
+    public ResponseEntity<?> adicionarAluno(@PathVariable Long turmaId, @PathVariable Matricula alunoMatricula) {
         try {
             Turma turma = turmaRepository.findById(turmaId).orElse(null);
             Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
@@ -233,7 +235,7 @@ public class TurmaController {
     // Remove aluno da turma
     @CacheEvict(value = "turmas_all", allEntries = true)
     @DeleteMapping("/{turmaId}/alunos/{alunoMatricula}")
-    public ResponseEntity<?> removerAluno(@PathVariable Long turmaId, @PathVariable String alunoMatricula) {
+    public ResponseEntity<?> removerAluno(@PathVariable Long turmaId, @PathVariable Matricula alunoMatricula) {
         try {
             Turma turma = turmaRepository.findById(turmaId).orElse(null);
             Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);

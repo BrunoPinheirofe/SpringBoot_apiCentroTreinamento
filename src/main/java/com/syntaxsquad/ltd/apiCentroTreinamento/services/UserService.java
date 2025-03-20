@@ -1,18 +1,24 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.services;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.User;
+import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AdministradorRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.InstrutorRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.UserRepository;
 import jakarta.mail.MessagingException;
+
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.UsersDtoRequest;
+import com.syntaxsquad.ltd.apiCentroTreinamento.enums.UserRole;
 import com.syntaxsquad.ltd.apiCentroTreinamento.infra.security.JwtUtil;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 @Service
 public class UserService {
@@ -21,6 +27,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
+
+    @Autowired
+    private AdministradorRepository adminRepository;
+    @Autowired
+    private InstrutorRepository instructorRepository;
+
+    @Autowired
+    private AlunoRepository alunoRepository;
+
+    
+
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, EmailService emailService) {
         this.userRepository = userRepository;
@@ -51,15 +68,30 @@ public class UserService {
     /**
      * Registra um novo usuário no sistema.
      */
-    public void register(User user) {
+    public void register(UsersDtoRequest usersDtoRequest) {
         // Verifica se o email já está cadastrado
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+
+        if (userRepository.findByEmail(usersDtoRequest.getEmail()).isPresent()) {
             throw new DataIntegrityViolationException("Email já cadastrado");
         }
 
+        UserRole role = null;
+    
+    if (adminRepository.findByMatricula(usersDtoRequest.getMatricula()).isPresent()) {
+        role = UserRole.ADMIN;
+    } else if (instructorRepository.findByMatricula(usersDtoRequest.getMatricula()).isPresent()) {
+        role = UserRole.TREINADOR;
+    } else if (alunoRepository.findByMatricula(usersDtoRequest.getMatricula()).isPresent()) {
+        role = UserRole.ALUNO;
+    } else {
+        throw new IllegalArgumentException("Matrícula informada não existe em nenhum cadastro");
+    }
+        User user = new User();
+        // Cria o objeto user a partir do DTO
+        user.setEmail(usersDtoRequest.getEmail());
         // Encripta a senha antes de salvar
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        user.setPassword(passwordEncoder.encode(usersDtoRequest.getPassword()));
+        user.setRole(role);
         userRepository.save(user);
     }
 

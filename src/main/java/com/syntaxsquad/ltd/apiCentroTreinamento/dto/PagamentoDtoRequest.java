@@ -3,16 +3,16 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 
-@Getter
-@Setter
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
 public class PagamentoDtoRequest {
 
     @NotNull(message = "A matricula do aluno é obrigatório.")
-    private String matriculaAluno;
+    private Matricula matriculaAluno;
 
     @NotNull(message = "O ID do plano é obrigatório.")
     private Long planoId;

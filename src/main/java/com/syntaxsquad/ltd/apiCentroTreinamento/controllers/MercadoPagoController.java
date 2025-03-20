@@ -20,6 +20,7 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.models.Plano;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.PagamentoRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.PlanoRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 import com.syntaxsquad.ltd.apiCentroTreinamento.services.DecodificarQrCode;
 import com.syntaxsquad.ltd.apiCentroTreinamento.services.MercadoPagoService;
 
@@ -132,7 +133,7 @@ public ResponseEntity<?> atualizarStatusPagamentos() {
 }
 
 @GetMapping("/alunos/{matricula}")
-public ResponseEntity<?> buscarAlunoPorMatricula(@PathVariable String matricula) {
+public ResponseEntity<?> buscarAlunoPorMatricula(@PathVariable Matricula matricula) {
     try {
         // Busca o aluno pela matrícula
         Aluno aluno = alunoRepository.findByMatricula(matricula).orElse(null);

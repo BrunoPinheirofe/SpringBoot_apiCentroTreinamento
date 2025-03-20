@@ -24,14 +24,25 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AdministradorReposi
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.InstrutorRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.UserRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 import com.syntaxsquad.ltd.apiCentroTreinamento.services.AlunoService;
 import com.syntaxsquad.ltd.apiCentroTreinamento.services.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/alunos")
 @Validated
+@Tag(name = "Alunos", description = "API para gerenciamento de alunos")
+@SecurityRequirement(name = "jwt_auth")
 public class AlunoController {
 
     @Autowired
@@ -52,7 +63,29 @@ public class AlunoController {
     // Criar aluno
     @CacheEvict(value = "alunos_all", allEntries = true)
     @PostMapping
-    public ResponseEntity<?> criarAluno(@Valid @RequestBody AlunoDtoRequest alunoRequest) {
+    @Operation(
+        summary = "Criar um novo aluno",
+        description = "Cria um novo aluno no sistema com base nos dados fornecidos"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Aluno criado com sucesso",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AlunoDtoResponse.class))
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Dados inválidos ou email já existente",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDto.class))
+        )
+    })
+    public ResponseEntity<?> criarAluno(
+            @Valid @RequestBody 
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                description = "Dados do aluno a ser criado", 
+                required = true, 
+                content = @Content(schema = @Schema(implementation = AlunoDtoRequest.class))
+            ) AlunoDtoRequest alunoRequest) {
 
         // Verifica se já existe um usuário com o mesmo email nos repositórios de Aluno,
         // Instrutor ou Administrador
@@ -86,19 +119,44 @@ public class AlunoController {
         Aluno alunoSalvo = alunoService.saveAluno(aluno);
 
         AlunoDtoResponse alunoDto = new AlunoDtoResponse(
-                alunoSalvo.getMatricula(), alunoSalvo.getNome(),
-                alunoSalvo.getSobrenome(), alunoSalvo.getEmail(),
-                alunoSalvo.getTelefone(), alunoSalvo.getDataNascimento(),
-                alunoSalvo.getDataCadastro(), alunoSalvo.getIdade(),
-                alunoSalvo.getGenero(), alunoSalvo.getObservacao());
-
+            alunoSalvo
+        );
         return ResponseEntity.ok(alunoDto);
     }
 
     // Atualizar aluno
     @CacheEvict(value = "alunos_all", allEntries = true)
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarAluno(@PathVariable String id, @Valid @RequestBody AlunoDtoRequest alunoRequest) {
+    @Operation(
+        summary = "Atualizar um aluno existente",
+        description = "Atualiza os dados de um aluno existente no sistema"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Aluno atualizado com sucesso",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = AlunoDtoResponse.class))
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Dados inválidos",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Aluno não encontrado",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDto.class))
+        )
+    })
+    public ResponseEntity<?> atualizarAluno(
+            @Parameter(description = "ID do aluno a ser atualizado", required = true) 
+            @PathVariable Matricula id, 
+            @Valid @RequestBody 
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                description = "Novos dados do aluno", 
+                required = true, 
+                content = @Content(schema = @Schema(implementation = AlunoDtoRequest.class))
+            ) AlunoDtoRequest alunoRequest) {
         Optional<Aluno> alunoExistente = alunoRepository.findById(id);
 
         if (alunoExistente.isEmpty()) {
@@ -138,7 +196,7 @@ public class AlunoController {
     // Remover aluno
     @CacheEvict(value = "alunos_all", allEntries = true)
     @DeleteMapping("/{matricula}")
-    public ResponseEntity<?> removerAluno(@PathVariable String matricula) {
+    public ResponseEntity<?> removerAluno(@PathVariable Matricula matricula) {
         Optional<Aluno> alunoExistente = alunoRepository.findByMatricula(matricula);
         if (alunoExistente.isEmpty()) {
             // Erro: Aluno não encontrado para remoção
@@ -150,7 +208,7 @@ public class AlunoController {
 
     // Buscar aluno por matricula
     @GetMapping("/{matricula}")
-    public ResponseEntity<?> buscarAlunoPorMatricula(@PathVariable String matricula) {
+    public ResponseEntity<?> buscarAlunoPorMatricula(@PathVariable Matricula matricula) {
         Aluno aluno = alunoRepository.findByMatricula(matricula).orElse(null);
         if (aluno == null) {
             // Erro: Aluno não encontrado

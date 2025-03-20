@@ -6,6 +6,8 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.models.Turma;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.PresencaRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.TurmaRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +38,7 @@ public class PresencaController {
     @PostMapping("/turmas/{turmaId}/alunos/{alunoMatricula}")
     public ResponseEntity<?> registrarPresenca(
             @PathVariable Long turmaId,
-            @PathVariable String alunoMatricula,
+            @PathVariable Matricula alunoMatricula,
             @RequestBody Presenca presenca) {
 
         Turma turma = turmaRepository.findById(turmaId).orElse(null);
@@ -61,7 +63,7 @@ public class PresencaController {
 
     // Busca presenças por aluno
     @GetMapping("/alunos/{alunoMatricula}")
-    public ResponseEntity<List<Presenca>> buscarPresencasPorAluno(@PathVariable String alunoMatricula) {
+    public ResponseEntity<List<Presenca>> buscarPresencasPorAluno(@PathVariable Matricula alunoMatricula) {
         Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();
@@ -91,7 +93,7 @@ public class PresencaController {
 
     // Conta presenças de um aluno
     @GetMapping("/alunos/{alunoMatricula}/contagem")
-    public ResponseEntity<Long> contarPresencasAluno(@PathVariable String alunoMatricula) {
+    public ResponseEntity<Long> contarPresencasAluno(@PathVariable Matricula alunoMatricula) {
         Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();
@@ -102,7 +104,7 @@ public class PresencaController {
 
     // Lista faltas de um aluno
     @GetMapping("/alunos/{alunoMatricula}/faltas")
-    public ResponseEntity<List<Presenca>> listarFaltasAluno(@PathVariable String alunoMatricula) {
+    public ResponseEntity<List<Presenca>> listarFaltasAluno(@PathVariable Matricula alunoMatricula) {
         Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();

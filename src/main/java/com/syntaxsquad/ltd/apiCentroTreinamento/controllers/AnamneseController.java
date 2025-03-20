@@ -3,6 +3,7 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.controllers;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Anamnese;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AnamneseRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -42,7 +43,7 @@ public class AnamneseController {
     @CacheEvict(value = "anamneses_all", allEntries = true)
     @PostMapping("/alunos/{alunoId}")
     public ResponseEntity<?> criarAnamnese(
-            @PathVariable String alunoMatricula,
+            @PathVariable Matricula alunoMatricula,
             @RequestBody Anamnese anamnese) {
         
         // Verifica se o aluno existe
@@ -79,7 +80,7 @@ public class AnamneseController {
 
     // Busca anamnese por aluno
     @GetMapping("/alunos/{alunoMatricula}")
-    public ResponseEntity<Anamnese> buscarAnamnesePorAluno(@PathVariable String alunoMatricula) {
+    public ResponseEntity<Anamnese> buscarAnamnesePorAluno(@PathVariable Matricula alunoMatricula) {
         Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();

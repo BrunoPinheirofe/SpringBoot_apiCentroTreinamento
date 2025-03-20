@@ -3,13 +3,14 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
 import java.time.LocalDate;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.SexoEnum;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 
 import lombok.Getter;
 import lombok.Setter;
 @Getter
 @Setter
 public class AdminDtoResponse {
- private String matricula;
+ private Matricula matricula;
     private String nome;
     private String sobrenome;
     private String email;
@@ -21,7 +22,7 @@ public class AdminDtoResponse {
 
 
     public AdminDtoResponse(
-    String matricula, 
+    Matricula matricula, 
     String nome, 
     String sobrenome, 
     String email, 

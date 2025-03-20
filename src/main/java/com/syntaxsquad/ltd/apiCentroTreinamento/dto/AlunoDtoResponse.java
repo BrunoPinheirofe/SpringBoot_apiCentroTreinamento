@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.SexoEnum;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import lombok.Setter;
 public class AlunoDtoResponse {
 
 
-    private String matricula;
+    private Matricula matricula;
     private String nome;
     private String sobrenome;
     private String email;
@@ -26,7 +27,7 @@ public class AlunoDtoResponse {
 
 
     public AlunoDtoResponse(
-    String matricula, 
+    Matricula matricula, 
     String nome, 
     String sobrenome, 
     String email, 

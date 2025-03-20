@@ -10,6 +10,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.List;
 
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
+
 public class TreinoDtoRequest {
 
     @NotBlank(message = "Nome é obrigatório")
@@ -25,7 +27,7 @@ public class TreinoDtoRequest {
     private List<Long> exerciciosIds; // Lista de IDs dos exercícios
 
     @NotEmpty(message = "A lista de IDs dos exercícios não pode ser vazia")
-    private List<String> alunosIds; // Lista de IDs dos alunos
+    private List<Matricula> alunosIds; // Lista de IDs dos alunos
 
 
 
@@ -38,11 +40,11 @@ public class TreinoDtoRequest {
         this.nome = nome;
     }
 
-    public List<String> getAlunosIds() {
+    public List<Matricula> getAlunosIds() {
         return alunosIds;
     }
 
-    public void setAlunosIds(List<String> alunosIds) {
+    public void setAlunosIds(List<Matricula> alunosIds) {
         this.alunosIds = alunosIds;
     }
 

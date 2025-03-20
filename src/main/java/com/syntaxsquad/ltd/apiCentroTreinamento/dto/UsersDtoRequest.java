@@ -1,19 +1,15 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.dto;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 
-import com.syntaxsquad.ltd.apiCentroTreinamento.enums.UserRole;
-
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@Setter
-
 public class UsersDtoRequest {
 
     @NotBlank(message = "Email é obrigatório")
@@ -21,10 +17,8 @@ public class UsersDtoRequest {
     private String email;
     @NotBlank(message = "Senha é obrigatória")
     private String password;
-    
-    @NotBlank(message = "Role é obrigatório deve ser válido (ADMIN,TREINADOR,ALUNO)")
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @NotBlank(message = "Matricula é obrigatória")
+    private Matricula matricula;
 
 
 }

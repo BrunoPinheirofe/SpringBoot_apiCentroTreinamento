@@ -1,6 +1,4 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.controllers;
-
-import com.google.common.base.Optional;
 import com.syntaxsquad.ltd.apiCentroTreinamento.dto.UsersDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.User;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.UserRepository;
@@ -8,7 +6,12 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.services.UserService;
 
 import jakarta.mail.MessagingException;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +27,35 @@ public class AuthController {
 
     // Endpoint para registrar um novo usuário
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody UsersDtoRequest userRequest) {
-        User user = new User(userRequest.getEmail(), userRequest.getPassword(), userRequest.getRole());
-        userService.register(user);
-        User newUser = userRepository.findByEmail(user.getEmail()).orElse(null);
-        return ResponseEntity.ok(newUser); // Retorna o usuário registrado
+    public ResponseEntity<?> register(@RequestBody UsersDtoRequest userRequest) {
+
+        try{
+            userService.register(userRequest);
+            Optional<User> newUser = userRepository.findByEmail(userRequest.getEmail());
+
+            String token = userService.authenticate(userRequest.getEmail(), userRequest.getPassword());
+
+
+            if (newUser.isPresent()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("mensagem", "Usuário registrado com sucesso");
+                response.put("token", token);
+                response.put("email", newUser.get().getEmail());
+                response.put("role", newUser.get().getRole());
+                
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao buscar usuário após registro");
+            }
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro ao registrar usuário: " + e.getMessage());
+        }
     }
 
     // Endpoint para login e geração de token

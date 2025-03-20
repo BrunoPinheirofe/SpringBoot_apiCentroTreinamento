@@ -1,6 +1,7 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.repositories;
 
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.SexoEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AlunoRepository extends JpaRepository<Aluno, String> {
+public interface AlunoRepository extends JpaRepository<Aluno, Matricula> {
     
     // Busca por email
     Optional<Aluno> findByEmail(String email);
@@ -30,9 +31,9 @@ public interface AlunoRepository extends JpaRepository<Aluno, String> {
     // Verifica se existe aluno com este email
     boolean existsByEmail(String email);
 
-    Optional<Aluno> findByMatricula(String matricula);
+    Optional<Aluno> findByMatricula(Matricula matricula);
 
-    List<Aluno> findByMatriculaIn(List<String> matriculas);
+    List<Aluno> findByMatriculaIn(List<Matricula> matriculas);
 
 
     List<Aluno> findAllByMatriculaIn(List<Long> alunosIds);
