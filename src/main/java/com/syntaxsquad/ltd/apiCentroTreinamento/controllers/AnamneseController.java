@@ -3,8 +3,11 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.controllers;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Anamnese;
 import com.syntaxsquad.ltd.apiCentroTreinamento.models.Aluno;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AnamneseRepository;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +25,7 @@ public class AnamneseController {
     private AlunoRepository alunoRepository;
 
     // Lista todas as anamneses
+    @Cacheable(value = "anamneses_all")
     @GetMapping
     public List<Anamnese> listarAnamneses() {
         return anamneseRepository.findAll();
@@ -36,9 +40,10 @@ public class AnamneseController {
     }
 
     // Cria nova anamnese
+    @CacheEvict(value = "anamneses_all", allEntries = true)
     @PostMapping("/alunos/{alunoId}")
     public ResponseEntity<?> criarAnamnese(
-            @PathVariable String alunoMatricula,
+            @PathVariable Matricula alunoMatricula,
             @RequestBody Anamnese anamnese) {
         
         // Verifica se o aluno existe
@@ -59,6 +64,7 @@ public class AnamneseController {
     }
 
     // Atualiza anamnese
+    @CacheEvict(value = "anamneses_all", allEntries = true)
     @PutMapping("/{id}")
     public ResponseEntity<Anamnese> atualizarAnamnese(
             @PathVariable Long id,
@@ -74,7 +80,7 @@ public class AnamneseController {
 
     // Busca anamnese por aluno
     @GetMapping("/alunos/{alunoMatricula}")
-    public ResponseEntity<Anamnese> buscarAnamnesePorAluno(@PathVariable String alunoMatricula) {
+    public ResponseEntity<Anamnese> buscarAnamnesePorAluno(@PathVariable Matricula alunoMatricula) {
         Aluno aluno = alunoRepository.findByMatricula(alunoMatricula).orElse(null);
         if (aluno == null) {
             return ResponseEntity.notFound().build();

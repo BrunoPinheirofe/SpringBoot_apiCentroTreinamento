@@ -3,8 +3,10 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+
 @Entity
 @Table(name = "exercicios")
 public class Exercicio {
@@ -33,4 +35,54 @@ public class Exercicio {
     @ManyToOne
     @JoinColumn(name = "treino_id")
     private Treino treino;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public Integer getRepeticoes() {
+        return repeticoes;
+    }
+
+    public void setRepeticoes(Integer repeticoes) {
+        this.repeticoes = repeticoes;
+    }
+
+    public Integer getSeries() {
+        return series;
+    }
+
+    public void setSeries(Integer series) {
+        this.series = series;
+    }
+
+    public Float getCarga() {
+        return carga;
+    }
+
+    public void setCarga(Float carga) {
+        this.carga = carga;
+    }
+
+    public Treino getTreino() {
+        return treino;
+    }
+
+    public void setTreino(Treino treino) {
+        this.treino = treino;
+    }
+
+    
 } 

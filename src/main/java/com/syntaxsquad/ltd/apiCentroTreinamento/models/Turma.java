@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @Entity
@@ -37,10 +38,6 @@ public class Turma {
 
     // Relacionamento com Alunos
     @ManyToMany
-    @JoinTable(
-        name = "turma_alunos",
-        joinColumns = @JoinColumn(name = "turma_id"),
-        inverseJoinColumns = @JoinColumn(name = "aluno_id")
-    )
+    @JoinTable(name = "turma_alunos", joinColumns = @JoinColumn(name = "turma_id"), inverseJoinColumns = @JoinColumn(name = "aluno_id"))
     private List<Aluno> alunos;
 }

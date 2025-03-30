@@ -1,0 +1,2 @@
+VAR#>mvn clean install -U
+VAR#>mvn clean install -U ;

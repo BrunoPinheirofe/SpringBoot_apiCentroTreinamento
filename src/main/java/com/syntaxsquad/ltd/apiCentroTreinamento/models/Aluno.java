@@ -2,24 +2,38 @@ package com.syntaxsquad.ltd.apiCentroTreinamento.models;
 
 import java.time.LocalDate;
 import java.util.Random;
+
+import com.syntaxsquad.ltd.apiCentroTreinamento.dto.AlunoDtoRequest;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.SexoEnum;
+import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
+
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.validation.constraints.*;
 
 @Data
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
 @Table(name = "alunos")
 public class Aluno {
     @Id
-    private String matricula;
+    @Embedded
+    private Matricula matricula;
 
     @NotBlank(message = "Nome é obrigatório")
     @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
@@ -33,7 +47,7 @@ public class Aluno {
 
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email deve ser válido")
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @NotBlank(message = "Telefone é obrigatório")
@@ -48,7 +62,7 @@ public class Aluno {
 
     @NotNull(message = "Data de cadastro é obrigatória")
     @Column(nullable = false)
-    private LocalDate dataCadastro;
+    private LocalDate dataCadastro = LocalDate.now();
 
     @Min(value = 0, message = "Idade não pode ser negativa")
     @Max(value = 120, message = "Idade não pode ser maior que 120")
@@ -64,17 +78,24 @@ public class Aluno {
     private String observacao;
 
     @OneToOne
-    @Column(nullable = true)
+    @JoinColumn(name = "email_user", referencedColumnName = "email", unique = true)
     private User user;
 
     @PrePersist
     protected void onCreate() {
-        this.matricula = generateMatricula();
+        this.matricula = Matricula.gerarMatricula();
     }
 
-    private String generateMatricula() {
-        LocalDate date = LocalDate.now();
-        int randomDigits = new Random().nextInt(9000) + 1000; // generates a 4-digit number
-        return date.toString().replace("-", "") + randomDigits;
+    public Aluno(String nome, String sobrenome, String email, String telefone, LocalDate dataNascimento, int idade, SexoEnum genero, String observacao,User user) {
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.email = email;
+        this.telefone = telefone;
+        this.dataNascimento = dataNascimento;
+        this.idade = idade;
+        this.genero = genero;
+        this.observacao = observacao;
+        this.user = user;
     }
+    public Aluno(){}
 }

@@ -1,15 +1,62 @@
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tagsSorter: alpha
+    operationsSorter: method
+    doc-expansion: none
+    filter: true
+    disable-swagger-default-url: true
+  show-actuator: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
 spring:
   application:
-    name: apiCentroTreinamento
+    name: centro_treinamento
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER}
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.mailtrap.io
+        transport:
+          protocol: smtp
+          connectiontimeout: 5000
+          writetimeout: 5000
+          timeout: 30000
+          connection.timeout: 5000
+
+jwt:
+  secret: ${SECRET_KEY}
+
+mercado:
+  pago:
+    access:
+      token: ${MERCADO_PAGO_ACCESS_TOKEN}
