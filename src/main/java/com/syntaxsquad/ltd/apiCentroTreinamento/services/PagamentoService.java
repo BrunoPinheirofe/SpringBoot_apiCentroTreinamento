@@ -94,7 +94,7 @@ public class PagamentoService {
             return hoje.plusMonths(1);  // Padrão: 1 mês
         }
     }
-    @Scheduled(fixedRate = 60000)  // Executar a cada 1 minutos
+    @Scheduled(fixedRate = 3600000)  // Executar a cada 1 hora (3600000 ms)
     public void atualizarStatusPagamentos() {
         // Busca todos os pagamentos
         List<Pagamento> pagamentos = pagamentoRepository.findAll();

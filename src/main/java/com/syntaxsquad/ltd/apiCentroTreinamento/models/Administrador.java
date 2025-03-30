@@ -23,7 +23,7 @@ public class Administrador {
     private String sobrenome;
 
     @Column(nullable = false)
-    private String email; 
+    private String email;
 
     @Column(nullable = false)
     private String telefone;
@@ -33,9 +33,6 @@ public class Administrador {
 
     @Column(nullable = false)
     private LocalDate dataCadastro = LocalDate.now();
-
-    @Column(nullable = false)
-    private int idade;
 
     @OneToOne
     @JoinColumn(name = "email_user", referencedColumnName = "email")
@@ -54,7 +51,6 @@ public class Administrador {
         this.telefone = telefone;
         this.dataNascimento = dataNascimento;
         this.dataCadastro = LocalDate.now();
-        this.idade = idade;
         this.user = user;
     }
     public Administrador() {

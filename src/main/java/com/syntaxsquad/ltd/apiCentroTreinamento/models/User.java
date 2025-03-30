@@ -1,20 +1,11 @@
 package com.syntaxsquad.ltd.apiCentroTreinamento.models;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import jakarta.persistence.Column;
 import com.syntaxsquad.ltd.apiCentroTreinamento.enums.UserRole;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Random;
-import jakarta.persistence.PrePersist;
 
 @Entity
 @AllArgsConstructor
@@ -31,5 +22,14 @@ public class User {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Aluno aluno;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Instrutor instrutor;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Administrador administrador;
 
 }

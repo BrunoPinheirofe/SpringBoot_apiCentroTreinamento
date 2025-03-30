@@ -7,19 +7,17 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 
 import lombok.Getter;
 import lombok.Setter;
+
 @Getter
 @Setter
 public class AdminDtoResponse {
- private Matricula matricula;
+    private Matricula matricula;
     private String nome;
     private String sobrenome;
     private String email;
     private String telefone;
     private LocalDate dataNascimento;
     private LocalDate dataCadastro;
-    private int idade;
-   
-
 
     public AdminDtoResponse(
     Matricula matricula, 
@@ -28,9 +26,8 @@ public class AdminDtoResponse {
     String email, 
     String telefone, 
     LocalDate dataNascimento, 
-    LocalDate dataCadastro, 
-    int idade
-)
+    LocalDate dataCadastro)
+
     {
         this.matricula = matricula;
         this.nome = nome;
@@ -39,8 +36,7 @@ public class AdminDtoResponse {
         this.telefone = telefone;
         this.dataNascimento = dataNascimento;
         this.dataCadastro = dataCadastro;
-        this.idade = idade;
        
     }
-    
+
 }

@@ -6,6 +6,8 @@ public class InstrutorDTO {
 
     private Matricula matricula;
     private String nome;
+    private String sobrenome;
+    private String especialidade;
 
     // Getters e Setters
     public Matricula getMatricula() {

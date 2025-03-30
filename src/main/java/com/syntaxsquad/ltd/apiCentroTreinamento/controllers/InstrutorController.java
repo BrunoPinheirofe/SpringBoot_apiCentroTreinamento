@@ -68,14 +68,20 @@ public class InstrutorController {
         }
 
         // Verifica se o usuário tem o role de INSTRUTOR
-        if (user.get().getRole() != UserRole.TREINADOR) {
+        if (user.get().getRole() != UserRole.INSTRUTOR) {
             return gerarErro("O usuário não tem permissão para criar instrutores.", HttpStatus.FORBIDDEN);
         }
 
         // Cria o objeto Instrutor
-        Instrutor novoInstrutor = new Instrutor(instrutorRequest.getNome(), instrutorRequest.getEspecialidade(),
-                instrutorRequest.getEmail(), user.get());
-
+        Instrutor novoInstrutor = new Instrutor();
+        novoInstrutor.setNome(instrutorRequest.getNome());
+        novoInstrutor.setSobrenome(instrutorRequest.getSobreNome());
+        novoInstrutor.setEspecialidade(instrutorRequest.getEspecialidade());
+        novoInstrutor.setTelefone(instrutorRequest.getTelefone());
+        novoInstrutor.setDataNascimento(instrutorRequest.getDataNascimento());
+        novoInstrutor.setEmail(instrutorRequest.getEmail());
+        novoInstrutor.setUser(user.get());
+        
         // Salva o novo Instrutor no banco de dados
         instrutorRepository.save(novoInstrutor);
 

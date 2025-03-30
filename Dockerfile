@@ -1,4 +1,5 @@
-FROM ubuntu:latest
-LABEL authors="bruno"
+FROM eclipse-temurin:17-jdk-alpine
 
-ENTRYPOINT ["top", "-b"]
+VOLUME /tmp
+COPY target/*.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]

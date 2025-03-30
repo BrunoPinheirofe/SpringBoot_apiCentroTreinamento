@@ -30,24 +30,25 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.POST, "api/auth/login", "api/auth/register").permitAll()
-                    // Autorização para GET de exercícios, turmas, presenças, etc. para ALUNO, TREINADOR e ADMIN
+                    // Autorização para GET de exercícios, turmas, presenças, etc. para ALUNO, INSTRUTOR e ADMIN
                     .requestMatchers(HttpMethod.GET, "/api/exercicios/**")
-                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name())
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.INSTRUTOR.name(), UserRole.ADMIN.name())
                     .requestMatchers("/api/auth/**")
-                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name())
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.INSTRUTOR.name(), UserRole.ADMIN.name())
                     .requestMatchers(HttpMethod.GET, "/api/alunos/**")
-                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Alunos também podem acessar
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.INSTRUTOR.name(), UserRole.ADMIN.name()) // Alunos também podem acessar
                     .requestMatchers(HttpMethod.GET, "/api/turmas/**")
-                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Turmas
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.INSTRUTOR.name(), UserRole.ADMIN.name()) // Turmas
                     .requestMatchers(HttpMethod.GET, "/api/presencas/**")
-                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Presenças
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.INSTRUTOR.name(), UserRole.ADMIN.name()) // Presenças
                     .requestMatchers(HttpMethod.GET, "/api/treinos")
-                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Treinos
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.INSTRUTOR.name(), UserRole.ADMIN.name()) // Treinos
                     .requestMatchers(HttpMethod.GET, "/api/anamneses/**")
-                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Anamneses
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.INSTRUTOR.name(), UserRole.ADMIN.name()) // Anamneses
                     .requestMatchers(HttpMethod.GET, "/api/planos/**")
-                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.TREINADOR.name(), UserRole.ADMIN.name()) // Planos
-                  
+                        .hasAnyAuthority(UserRole.ALUNO.name(), UserRole.INSTRUTOR.name(), UserRole.ADMIN.name()) // Planos
+
+
                     // Autorização de admin
                     .requestMatchers("/api/administradores/**")
                         .hasAuthority(UserRole.ADMIN.name())
@@ -89,10 +90,4 @@ public class SecurityConfigurations {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
-
-  
-
-    
 }

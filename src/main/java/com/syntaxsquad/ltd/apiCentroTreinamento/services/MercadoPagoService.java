@@ -60,7 +60,7 @@ public class MercadoPagoService {
     public PagamentoResponse processarPagamento(Pagamento pagamento) {
         if (pagamento == null || pagamento.getPlano() == null || pagamento.getAluno() == null) {
             logger.error("Dados do pagamento estão incompletos.");
-            return new PagamentoResponse("Dados do pagamento estão incompletos.", null, null);
+            return new PagamentoResponse();
         }
 
         // Configurar o Mercado Pago
@@ -111,7 +111,7 @@ public class MercadoPagoService {
                     String qrCodeBase64 = convertQrCodeToBase64(qrCode);
 
                     if (qrCodeBase64 == null) {
-                        return new PagamentoResponse("Erro ao gerar o QR Code.", null, null);
+                        return new PagamentoResponse();
                     }
 
                     // Log do ticket URL e QR Code
@@ -130,15 +130,15 @@ public class MercadoPagoService {
 
             } else {
                 logger.error("Erro ao processar pagamento. Resposta da API vazia.");
-                return new PagamentoResponse("Erro ao processar pagamento. Resposta da API vazia.", null, null);
+                return new PagamentoResponse();
             }
         } catch (Exception e) {
             // Log de erro usando logger
             logger.error("Erro ao processar pagamento: {}", e.getMessage(), e);
-            return new PagamentoResponse("Erro ao processar pagamento: " + e.getMessage(), null, null);
+            return new PagamentoResponse();
         }
 
-        return new PagamentoResponse("Erro desconhecido ao processar o pagamento.", null, null);
+        return new PagamentoResponse();
     }
 
     // Método para converter o PIX code em QR Code e retornar como base64

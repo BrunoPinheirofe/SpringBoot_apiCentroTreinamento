@@ -48,7 +48,7 @@ public class AdminController {
         AdminDtoResponse adminDto = new AdminDtoResponse(
                 administrador.getMatricula(), administrador.getNome(), administrador.getSobrenome(),
                 administrador.getEmail(), administrador.getTelefone(), administrador.getDataNascimento(),
-                administrador.getDataCadastro(), administrador.getIdade());
+                administrador.getDataCadastro());
 
         return ResponseEntity.ok(adminDto);
     }
@@ -67,14 +67,13 @@ public class AdminController {
         administrador.setEmail(admin.getEmail());
         administrador.setTelefone(admin.getTelefone());
         administrador.setDataNascimento(admin.getDataNascimento());
-        administrador.setIdade(admin.getIdade());
 
         administrador = adminRepository.save(administrador);
 
         AdminDtoResponse adminDto = new AdminDtoResponse(
                 administrador.getMatricula(), administrador.getNome(), administrador.getSobrenome(),
                 administrador.getEmail(), administrador.getTelefone(), administrador.getDataNascimento(),
-                administrador.getDataCadastro(), administrador.getIdade());
+                administrador.getDataCadastro());
 
         return ResponseEntity.ok(adminDto);
     }
@@ -103,7 +102,7 @@ public class AdminController {
         AdminDtoResponse adminDto = new AdminDtoResponse(
                 administrador.getMatricula(), administrador.getNome(), administrador.getSobrenome(),
                 administrador.getEmail(), administrador.getTelefone(), administrador.getDataNascimento(),
-                administrador.getDataCadastro(), administrador.getIdade());
+                administrador.getDataCadastro());
 
         return ResponseEntity.ok(adminDto);
     }
@@ -116,7 +115,7 @@ public class AdminController {
                 .map(admin -> new AdminDtoResponse(
                         admin.getMatricula(), admin.getNome(), admin.getSobrenome(),
                         admin.getEmail(), admin.getTelefone(), admin.getDataNascimento(),
-                        admin.getDataCadastro(), admin.getIdade()))
+                        admin.getDataCadastro()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(adminsDto);
     }

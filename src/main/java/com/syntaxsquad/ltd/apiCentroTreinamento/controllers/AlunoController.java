@@ -26,8 +26,6 @@ import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.InstrutorRepository
 import com.syntaxsquad.ltd.apiCentroTreinamento.repositories.UserRepository;
 import com.syntaxsquad.ltd.apiCentroTreinamento.serializers.Matricula;
 import com.syntaxsquad.ltd.apiCentroTreinamento.services.AlunoService;
-import com.syntaxsquad.ltd.apiCentroTreinamento.services.UserService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -52,7 +52,6 @@ public class UserService {
     public String authenticate(String email, String rawPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException("Usuário não encontrado"));
-
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new BadCredentialsException("Senha inválida");
         }
@@ -80,7 +79,7 @@ public class UserService {
     if (adminRepository.findByMatricula(usersDtoRequest.getMatricula()).isPresent()) {
         role = UserRole.ADMIN;
     } else if (instructorRepository.findByMatricula(usersDtoRequest.getMatricula()).isPresent()) {
-        role = UserRole.TREINADOR;
+        role = UserRole.INSTRUTOR;
     } else if (alunoRepository.findByMatricula(usersDtoRequest.getMatricula()).isPresent()) {
         role = UserRole.ALUNO;
     } else {
